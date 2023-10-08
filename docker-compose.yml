@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: tcc_db
+    environment:
+      - POSTGRES_DATABASE: "tcc_db"
+      - POSTGRES_USER: "rafael"
+      - POSTGRES_PASSOWORD: 1234
+    ports:
+      - "5435:5432"
