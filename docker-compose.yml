@@ -1,12 +1,12 @@
-version: '3.5'
+version: "3.5"
 
 services:
   postgres:
     image: postgres:latest
-    container_name: tcc_db
+    container_name: tcc_server_db
     environment:
-      - POSTGRES_DATABASE: "tcc_db"
-      - POSTGRES_USER: "rafael"
-      - POSTGRES_PASSOWORD: 1234
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5435:5432"
+      - "${DB_PORT}:5432"
