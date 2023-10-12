@@ -4,6 +4,12 @@ TODO: write description and docs here 😄
 
 ### Database `tcc_db` 
 
+To running database containers you'll run:
+
+```bash
+make start
+```
+
 Just run the following query for `products` table:
 
 ```sql
