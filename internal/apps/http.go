@@ -18,9 +18,9 @@ func NewHttpApp(ctx context.Context, c Creator, rg ReportGenerator) HttpApp {
 }
 
 func (h *HttpApp) Routes(a *fiber.App) {
-	a.Group("/products")
-	a.Get("/report", h.getReport)
-	a.Post("", h.createProduct)
+	v1 := a.Group("/products")
+	v1.Get("/report", h.getReport)
+	v1.Post("", h.createProduct)
 }
 
 func (h *HttpApp) createProduct(c *fiber.Ctx) error {

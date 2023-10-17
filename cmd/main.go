@@ -24,7 +24,7 @@ type Env struct {
 		Driver   string `env:"DB_DRIVER"`
 		User     string `env:"DB_USER"`
 		Password string `env:"DB_PASSWORD"`
-		Name     string `env:"DB_NAME"`
+		Name     string `env:"DB_DATABASE"`
 		Host     string `env:"DB_HOST"`
 		Port     string `env:"DB_PORT"`
 	}
@@ -34,7 +34,7 @@ func getEnv() (*Env, error) {
 	env := &Env{}
 	_, err := goenv.UnmarshalFromEnviron(env)
 
-	log.Default().Println("environment loaded")
+	log.Default().Println("environment loaded - ", env)
 
 	return env, err
 }
@@ -74,9 +74,13 @@ func main() {
 	c := u.NewCreateUseCase(r)
 	rg := u.NewReportUseCase(r)
 
+	setupApp := a.NewSetupApp(context.Background(), r)
+	setupApp.Routes(app)
+	log.Default().Println("setup application working")
+
 	httpApp := a.NewHttpApp(context.Background(), c, rg)
 	httpApp.Routes(app)
 	log.Default().Println("HTTP endpoints working")
 
-	app.Listen(env.AppPort)
+	app.Listen(fmt.Sprintf(":%s", env.AppPort))
 }

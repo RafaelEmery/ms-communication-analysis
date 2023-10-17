@@ -2,11 +2,14 @@ package apps
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"github.com/gofiber/fiber/v2"
 )
+
+// TODO: applications and database setup can be a custom command - test it later!
 
 type ProductsManager interface {
 	Count(ctx context.Context) (int, error)
@@ -15,23 +18,27 @@ type ProductsManager interface {
 }
 
 type ProductsToGenerate struct {
-	Quantity int
+	Quantity int `json:"quantity"`
 }
 
-type ProjectContext struct {
+type SetupApp struct {
 	ctx context.Context
 	d   ProductsManager
 }
 
-func (pc *ProjectContext) Routes(a *fiber.App) {
-	a.Group("/setup")
-	a.Get("/quantity", pc.getProductsQuantity)
-	a.Post("/generate", pc.generateProducts)
-	a.Post("/drop", pc.dropProducts)
+func NewSetupApp(ctx context.Context, d ProductsManager) SetupApp {
+	return SetupApp{ctx: ctx, d: d}
 }
 
-func (pc *ProjectContext) getProductsQuantity(c *fiber.Ctx) error {
-	o, err := pc.d.Count(context.Background())
+func (s *SetupApp) Routes(a *fiber.App) {
+	v1 := a.Group("/setup")
+	v1.Get("/count", s.getProductsCount)
+	v1.Post("/generate", s.generateProducts)
+	v1.Delete("/drop", s.dropProducts)
+}
+
+func (s *SetupApp) getProductsCount(c *fiber.Ctx) error {
+	o, err := s.d.Count(context.Background())
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(err.Error())
 	}
@@ -39,29 +46,31 @@ func (pc *ProjectContext) getProductsQuantity(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(o)
 }
 
-func (pc *ProjectContext) generateProducts(c *fiber.Ctx) error {
+func (s *SetupApp) generateProducts(c *fiber.Ctx) error {
 	var (
 		body    ProductsToGenerate
 		product domain.Product
 	)
-	if err := c.BodyParser(body); err != nil {
+	if err := c.BodyParser(&body); err != nil {
 		return err
 	}
 
 	p := make(domain.Products, 0)
 	for i := 0; i < body.Quantity; i++ {
-		p = append(p, *product.Fake())
+		fp := *product.Fake()
+		log.Default().Println("fake product - ", fp)
+		p = append(p, fp)
 	}
 
-	if err := pc.d.BatchCreate(pc.ctx, p); err != nil {
+	if err := s.d.BatchCreate(s.ctx, p); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(err.Error())
 	}
 
 	return c.Status(http.StatusNoContent).JSON(nil)
 }
 
-func (pc *ProjectContext) dropProducts(c *fiber.Ctx) error {
-	if err := pc.d.DeleteAll(context.Background()); err != nil {
+func (s *SetupApp) dropProducts(c *fiber.Ctx) error {
+	if err := s.d.DeleteAll(context.Background()); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(err.Error())
 	}
 

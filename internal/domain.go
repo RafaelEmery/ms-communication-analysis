@@ -14,8 +14,8 @@ type Product struct {
 	SKU               string    `json:"sku"`
 	SellerName        string    `json:"seller_name"`
 	Price             float64   `json:"price"`
-	AvailableQuantity int64     `json:"available_quantity"`
-	SalesQuantity     int64     `json:"sales_quantity"`
+	AvailableQuantity int       `json:"available_quantity"`
+	SalesQuantity     int       `json:"sales_quantity"`
 	Active            bool      `json:"active"`
 	CreatedAt         time.Time `json:"created_at,omitempty"`
 	UpdatedAt         time.Time `json:"updated_at,omitempty"`
@@ -27,8 +27,8 @@ func (p *Product) Fake() *Product {
 	p.SKU = faker.UUID()
 	p.SellerName = faker.Name()
 	p.Price = faker.Price(1.0, 999.0)
-	p.AvailableQuantity = faker.Int64()
-	p.SalesQuantity = faker.Int64()
+	p.AvailableQuantity = faker.RandomInt([]int{100, 200, 300, 400, 500})
+	p.SalesQuantity = faker.RandomInt([]int{10, 20, 30, 40, 50})
 	p.Active = faker.Bool()
 	p.CreatedAt = faker.Date()
 	p.UpdatedAt = faker.Date()
