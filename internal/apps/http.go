@@ -17,7 +17,7 @@ func NewHttpApp(ctx context.Context, c Creator, rg ReportGenerator) HttpApp {
 	return HttpApp{ctx: ctx, c: c, rg: rg}
 }
 
-func (h HttpApp) Routes(a *fiber.App) {
+func (h *HttpApp) Routes(a *fiber.App) {
 	a.Group("/products")
 	a.Get("/report", h.getReport)
 	a.Post("", h.createProduct)

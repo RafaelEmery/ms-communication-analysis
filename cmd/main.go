@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 
 	goenv "github.com/Netflix/go-env"
 
@@ -38,7 +39,7 @@ func getEnv() (*Env, error) {
 	return env, err
 }
 
-func getDatabase(env *Env) (*sql.DB, error) {
+func connectDatabase(env *Env) (*sql.DB, error) {
 	dbSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", env.DB.Host, env.DB.Port, env.DB.User, env.DB.Password, env.DB.Name)
 
 	db, err := sql.Open(env.DB.Driver, dbSource)
@@ -53,35 +54,29 @@ func getDatabase(env *Env) (*sql.DB, error) {
 	return db, nil
 }
 
-func setupHttpApp(app *fiber.App, c a.Creator, rg a.ReportGenerator) {
-	httpApp := a.NewHttpApp(context.Background(), c, rg)
-	httpApp.Routes(app)
-
-	log.Default().Println("HTTP endpoints working")
-}
-
 func main() {
 	env, err := getEnv()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db, err := getDatabase(env)
+	db, err := connectDatabase(env)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	r := i.NewRepository(db)
 	app := fiber.New()
-
-	creator := u.NewCreateUseCase(r)
-	reportGenerator := u.NewReportUseCase(r)
-
-	setupHttpApp(app, creator, reportGenerator)
-
 	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.JSON("Testing...")
+		return c.Status(http.StatusOK).JSON("Testing...")
 	})
+
+	c := u.NewCreateUseCase(r)
+	rg := u.NewReportUseCase(r)
+
+	httpApp := a.NewHttpApp(context.Background(), c, rg)
+	httpApp.Routes(app)
+	log.Default().Println("HTTP endpoints working")
 
 	app.Listen(env.AppPort)
 }
