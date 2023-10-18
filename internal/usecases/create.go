@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
@@ -25,6 +26,8 @@ func (u createUseCase) Create(ctx context.Context, p *domain.Product) (domain.Pr
 	p.ID = uuid.NewString()
 	p.CreatedAt = time.Now()
 	p.UpdatedAt = time.Now()
+
+	fmt.Println(p)
 
 	if err := u.c.Create(ctx, *p); err != nil {
 		return domain.Product{}, err

@@ -11,5 +11,5 @@ type Creator interface {
 }
 
 type ReportGenerator interface {
-	GenerateReport(ctx context.Context) ([]byte, error)
+	GenerateReport(ctx context.Context) (string, error)
 }

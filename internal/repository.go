@@ -27,7 +27,29 @@ func (r Repository) Create(ctx context.Context, p Product) error {
 }
 
 func (r Repository) Get(ctx context.Context) (Products, error) {
-	return Products{}, nil
+	query := `
+		SELECT 
+			id, name, sku, seller_name, price, available_quantity, sales_quantity, active, created_at, updated_at
+		FROM products
+	`
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var p Products
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(&i.ID, &i.Name, &i.SKU, &i.SellerName, &i.Price, &i.AvailableQuantity, &i.SalesQuantity, &i.Active, &i.CreatedAt, &i.UpdatedAt); err != nil {
+			return p, err
+		}
+		p = append(p, i)
+	}
+	if err = rows.Err(); err != nil {
+		return p, err
+	}
+	return p, nil
 }
 
 func (r Repository) Count(ctx context.Context) (count int, err error) {
