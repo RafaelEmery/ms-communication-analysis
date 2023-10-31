@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS
     sku VARCHAR(64) NOT NULL,
     seller_name VARCHAR(64) NOT NULL,
     price FLOAT NOT NULL,
+    available_discount FLOAT NOT NULL,
     available_quantity INTEGER NOT NULL,
     sales_quantity INTEGER NOT NULL,
     active BOOLEAN NOT NULL,
@@ -28,3 +29,5 @@ CREATE TABLE IF NOT EXISTS
     CONSTRAINT product_pkey PRIMARY KEY (id)
 );
 ```
+
+**TODO:** Set table by default at postgres container `volumes`

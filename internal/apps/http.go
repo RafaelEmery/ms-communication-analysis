@@ -13,19 +13,20 @@ type Return struct {
 }
 
 type HttpApp struct {
-	ctx context.Context
-	c   Creator
-	rg  ReportGenerator
+	c  Creator
+	rg ReportGenerator
+	pg ProductByDiscountGetter
 }
 
-func NewHttpApp(ctx context.Context, c Creator, rg ReportGenerator) HttpApp {
-	return HttpApp{ctx: ctx, c: c, rg: rg}
+func NewHttpApp(ctx context.Context, c Creator, rg ReportGenerator, pg ProductByDiscountGetter) HttpApp {
+	return HttpApp{c: c, rg: rg, pg: pg}
 }
 
 func (h *HttpApp) Routes(a *fiber.App) {
 	v1 := a.Group("/products")
 	v1.Post("", h.createProduct)
 	v1.Get("/report", h.getReport)
+	v1.Get("/discount", h.getByAppliedDiscount)
 }
 
 func (h *HttpApp) createProduct(c *fiber.Ctx) error {
@@ -36,7 +37,7 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 		return err
 	}
 
-	o, err := h.c.Create(h.ctx, &product)
+	o, err := h.c.Create(c.Context(), &product)
 	if err != nil {
 		return err
 	}
@@ -45,7 +46,17 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 }
 
 func (h *HttpApp) getReport(c *fiber.Ctx) error {
-	o, err := h.rg.GenerateReport(h.ctx)
+	o, err := h.rg.GenerateReport(c.Context())
+	if err != nil {
+		return err
+	}
+
+	return c.Status(http.StatusOK).JSON(Return{Result: o})
+}
+
+// TODO: test get by applied discount endpoint
+func (h *HttpApp) getByAppliedDiscount(c *fiber.Ctx) error {
+	o, err := h.pg.GetByDiscount(c.Context())
 	if err != nil {
 		return err
 	}

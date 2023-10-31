@@ -73,12 +73,13 @@ func main() {
 
 	c := u.NewCreateUseCase(r)
 	rg := u.NewReportUseCase(r)
+	dpg := u.NewGetByDiscountUseCase(r)
 
 	setupApp := a.NewSetupApp(context.Background(), r)
 	setupApp.Routes(app)
 	log.Default().Println("setup application working")
 
-	httpApp := a.NewHttpApp(context.Background(), c, rg)
+	httpApp := a.NewHttpApp(context.Background(), c, rg, dpg)
 	httpApp.Routes(app)
 	log.Default().Println("HTTP endpoints working")
 

@@ -13,3 +13,7 @@ type Creator interface {
 type ReportGenerator interface {
 	GenerateReport(ctx context.Context) (string, error)
 }
+
+type ProductByDiscountGetter interface {
+	GetByDiscount(ctx context.Context) (domain.Products, error)
+}

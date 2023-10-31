@@ -5,21 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 )
 
-type SalesQuantityGetter interface {
-	Get(ctx context.Context) (domain.Products, error)
-}
-
 type reportUseCase struct {
-	g SalesQuantityGetter
+	g ProductGetter
 }
 
-func NewReportUseCase(g SalesQuantityGetter) reportUseCase {
+func NewReportUseCase(g ProductGetter) reportUseCase {
 	return reportUseCase{g: g}
 }
 
