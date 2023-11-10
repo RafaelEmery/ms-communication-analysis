@@ -30,7 +30,7 @@ func (u getByDiscountUseCase) GetByDiscount(ctx context.Context) (domain.Product
 func (u getByDiscountUseCase) applyAvailableDiscount(ps domain.Products) domain.Products {
 	dp := make(domain.Products, 0)
 	for _, p := range ps {
-		discountPrice := p.Price - (p.Price / p.AvailableDiscount)
+		discountPrice := p.Price - (p.Price * p.AvailableDiscount)
 		p.Price = discountPrice
 		p.DiscountApplied = true
 

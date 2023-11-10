@@ -14,7 +14,7 @@ type Product struct {
 	SKU               string    `json:"sku"`
 	SellerName        string    `json:"seller_name"`
 	Price             float64   `json:"price"`
-	AvailableDiscount float64   `json:"discount"`
+	AvailableDiscount float64   `json:"available_discount"`
 	AvailableQuantity int       `json:"available_quantity"`
 	SalesQuantity     int       `json:"sales_quantity"`
 	Active            bool      `json:"active"`
