@@ -22,16 +22,21 @@ func NewCreateUseCase(c Creator) createUseCase {
 }
 
 // TODO: should product be a pointer?
-func (u createUseCase) Create(ctx context.Context, p *domain.Product) (domain.Product, error) {
+func (u createUseCase) Create(ctx context.Context, p domain.Product) (domain.Product, error) {
+
+	fmt.Println("inside use case")
+
 	p.ID = uuid.NewString()
+	p.DiscountApplied = false
 	p.CreatedAt = time.Now()
 	p.UpdatedAt = time.Now()
 
-	fmt.Println(p)
-
-	if err := u.c.Create(ctx, *p); err != nil {
+	if err := u.c.Create(ctx, p); err != nil {
+		fmt.Println("error on creating", err.Error())
 		return domain.Product{}, err
 	}
 
-	return *p, nil
+	fmt.Println("product - ", p)
+
+	return p, nil
 }

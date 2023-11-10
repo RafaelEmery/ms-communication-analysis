@@ -7,7 +7,7 @@ import (
 )
 
 type Creator interface {
-	Create(ctx context.Context, p *domain.Product) (domain.Product, error)
+	Create(ctx context.Context, p domain.Product) (domain.Product, error)
 }
 
 type ReportGenerator interface {

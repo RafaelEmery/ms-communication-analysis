@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 
 	goenv "github.com/Netflix/go-env"
+	"google.golang.org/grpc"
 
 	i "github.com/RafaelEmery/performance-analysis-server/internal"
 	a "github.com/RafaelEmery/performance-analysis-server/internal/apps"
@@ -19,8 +20,11 @@ import (
 )
 
 type Env struct {
-	AppPort string `env:"APP_PORT"`
-	DB      struct {
+	AppPorts struct {
+		HTTP string `env:"HTTP_APP_PORT"`
+		GRPC string `env:"GRPC_APP_PORT"`
+	}
+	DB struct {
 		Driver   string `env:"DB_DRIVER"`
 		User     string `env:"DB_USER"`
 		Password string `env:"DB_PASSWORD"`
@@ -67,13 +71,26 @@ func main() {
 
 	r := i.NewRepository(db)
 	app := fiber.New()
-	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.Status(http.StatusOK).JSON("Testing...")
-	})
 
 	c := u.NewCreateUseCase(r)
 	rg := u.NewReportUseCase(r)
 	dpg := u.NewGetByDiscountUseCase(r)
+
+	// TODO: separate main files to HTTP app and gRPC app
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", env.AppPorts.GRPC))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := grpc.NewServer()
+	productHandlerServer := a.NewGRPCServer(c, rg, dpg)
+
+	a.RegisterProductHandlerServer(s, productHandlerServer)
+
+	log.Printf("grpc server listening at %v", lis.Addr())
+	if err = s.Serve(lis); err != nil {
+		log.Fatal(err)
+	}
 
 	setupApp := a.NewSetupApp(context.Background(), r)
 	setupApp.Routes(app)
@@ -83,5 +100,5 @@ func main() {
 	httpApp.Routes(app)
 	log.Default().Println("HTTP endpoints working")
 
-	app.Listen(fmt.Sprintf(":%s", env.AppPort))
+	app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
 }

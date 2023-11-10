@@ -15,7 +15,7 @@ func NewRepository(db *sql.DB) Repository {
 
 func (r Repository) Create(ctx context.Context, p Product) error {
 	query := `
-		INSERT INTO products (id, name, sku, seller_name, price, discount, available_quantity, sales_quantity, active, created_at, updated_at) 
+		INSERT INTO products (id, name, sku, seller_name, price, available_discount, available_quantity, sales_quantity, active, created_at, updated_at) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`
 	_, err := r.db.ExecContext(ctx, query, p.ID, p.Name, p.SKU, p.SellerName, p.Price, p.AvailableDiscount, p.AvailableQuantity, p.SalesQuantity, p.Active, p.CreatedAt, p.UpdatedAt)

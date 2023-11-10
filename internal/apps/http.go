@@ -37,7 +37,7 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 		return err
 	}
 
-	o, err := h.c.Create(c.Context(), &product)
+	o, err := h.c.Create(c.Context(), product)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,65 @@
+syntax = "proto3";
+option go_package = "github.com/RafaelEmery/performance-analysis-server/internal/apps";
+
+// TODO: write command - protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/message.proto
+
+// TODO: is this the definition of "prodedure calls"?
+service ProductHandler {
+    rpc Create (CreateProductRequest) returns (CreateProductResponse) {}
+    rpc Report (EmptyRequest) returns (GenerateReportResponse) {}
+    rpc GetByDiscount (EmptyRequest) returns (GetByDiscountResponse) {}
+}
+
+// TODO: validate the request without body
+message EmptyRequest {}
+
+// TODO: what means all the = <number>
+// TODO: studies about RPC messages
+message CreateProductRequest {
+    string name = 1;
+    string sku = 2;
+    string seller_name = 3;
+    float price = 4;
+    float available_discount = 5;
+    int32 available_quantity = 6;
+    int32 sales_quantity = 7;
+    bool active = 8;
+}
+
+message CreateProductResponse {
+    string id = 1;
+    string name = 2;
+    string sku = 3;
+    string seller_name = 4;
+    float price = 5;
+    float available_discount = 6;
+    int32 available_quantity = 7;
+    int32 sales_quantity = 8;
+    bool active = 9;
+    bool discount_applied = 10;
+    string created_at = 11;
+    string updated_at = 12;
+}
+
+message GenerateReportResponse {
+    string file_name = 1;
+}
+
+message Product {
+    string id = 1;
+    string name = 2;
+    string sku = 3;
+    string seller_name = 4;
+    float price = 5;
+    float available_discount = 6;
+    int32 available_quantity = 7;
+    int32 sales_quantity = 8;
+    bool active = 9;
+    bool discount_applied = 10;
+    string created_at = 11;
+    string updated_at = 12;
+}
+
+message GetByDiscountResponse {
+    repeated Product products = 1;
+}
