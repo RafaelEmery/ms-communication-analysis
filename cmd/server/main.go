@@ -9,6 +9,7 @@ import (
 	"net"
 
 	goenv "github.com/Netflix/go-env"
+	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 
 	i "github.com/RafaelEmery/performance-analysis-server/internal"
@@ -21,9 +22,10 @@ import (
 )
 
 const (
-	setupFlag = "setup"
-	httpFlag  = "http"
-	grpcFlag  = "grpc"
+	setupFlag    = "setup"
+	httpFlag     = "http"
+	grpcFlag     = "grpc"
+	rabbitMQFlag = "rabbitmq"
 )
 
 type Env struct {
@@ -39,6 +41,13 @@ type Env struct {
 		Name     string `env:"DB_DATABASE"`
 		Host     string `env:"DB_HOST"`
 		Port     string `env:"DB_PORT"`
+	}
+	RabbitMQ struct {
+		Port      string `env:"RABBITMQ_PORT"`
+		WebPort   string `env:"RABBITMQ_WEB_PORT"`
+		User      string `env:"RABBITMQ_USER"`
+		QueueName string `env:"RABBITMQ_QUEUE_NAME"`
+		Host      string `env:"RABBITMQ_HOST"`
 	}
 }
 
@@ -117,7 +126,36 @@ func main() {
 
 		log.Default().Println("HTTP endpoints working")
 		app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
+	}
+	if flag.Arg(0) == rabbitMQFlag {
+		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer conn.Close()
+
+		ch, err := conn.Channel()
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer ch.Close()
+
+		q, err := ch.QueueDeclare(
+			env.RabbitMQ.QueueName, // Name
+			false,                  // Durable
+			false,                  // Delete when unused
+			false,                  // Exclusive
+			false,                  // No-wait
+			nil,                    // Arguments
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		consumer := a.NewConsumer(q, c, rg, dpg)
+		log.Printf("consumer running on queue %s", q.Name)
+		consumer.Start(context.Background(), ch)
 	} else {
-		log.Fatalf("can't run application %s - please provide valid flag (app=setup|http|grpc).", flag.Arg(0))
+		log.Fatalf("can't run application %s - please provide valid flag (app=setup|http|grpc|rabbitmq).", flag.Arg(0))
 	}
 }
