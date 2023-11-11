@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
@@ -24,7 +25,7 @@ func (u reportUseCase) GenerateReport(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	fileName := fmt.Sprintf("./.tmp/report_%s.pdf", time.Now().Format("2006-02-01_18:00:00"))
+	fileName := fmt.Sprintf("./.tmp/report_%s_%s.pdf", time.Now().Format("2006-02-01_18:00:00"), uuid.NewString())
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
 	m.SetPageMargins(10, 15, 10)
 

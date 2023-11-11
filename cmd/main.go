@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net"
 
 	goenv "github.com/Netflix/go-env"
+	"google.golang.org/grpc"
 
 	i "github.com/RafaelEmery/performance-analysis-server/internal"
 	a "github.com/RafaelEmery/performance-analysis-server/internal/apps"
@@ -76,20 +78,20 @@ func main() {
 
 	// TODO: use flags commands to specify which server is to run
 	// TODO: separate main files to HTTP app and gRPC app
-	// lis, err := net.Listen("tcp", fmt.Sprintf(":%s", env.AppPorts.GRPC))
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", env.AppPorts.GRPC))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// s := grpc.NewServer()
-	// productHandlerServer := a.NewGRPCServer(c, rg, dpg)
+	s := grpc.NewServer()
+	productHandlerServer := a.NewGRPCServer(c, rg, dpg)
 
-	// a.RegisterProductHandlerServer(s, productHandlerServer)
+	a.RegisterProductHandlerServer(s, productHandlerServer)
 
-	// log.Printf("grpc server listening at %v", lis.Addr())
-	// if err = s.Serve(lis); err != nil {
-	// 	log.Fatal(err)
-	// }
+	log.Printf("grpc server listening at %v", lis.Addr())
+	if err = s.Serve(lis); err != nil {
+		log.Fatal(err)
+	}
 
 	setupApp := a.NewSetupApp(context.Background(), r)
 	setupApp.Routes(app)

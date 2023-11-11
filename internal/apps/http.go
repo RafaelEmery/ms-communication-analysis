@@ -34,12 +34,12 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 		product domain.Product
 	)
 	if err := c.BodyParser(&product); err != nil {
-		return err
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	o, err := h.c.Create(c.Context(), product)
 	if err != nil {
-		return err
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	return c.Status(http.StatusOK).JSON(Return{Result: o})
@@ -48,7 +48,7 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 func (h *HttpApp) getReport(c *fiber.Ctx) error {
 	o, err := h.rg.GenerateReport(c.Context())
 	if err != nil {
-		return err
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	return c.Status(http.StatusOK).JSON(Return{Result: o})
@@ -58,7 +58,7 @@ func (h *HttpApp) getReport(c *fiber.Ctx) error {
 func (h *HttpApp) getByAppliedDiscount(c *fiber.Ctx) error {
 	o, err := h.pg.GetByDiscount(c.Context())
 	if err != nil {
-		return err
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	return c.Status(http.StatusOK).JSON(Return{Result: o})

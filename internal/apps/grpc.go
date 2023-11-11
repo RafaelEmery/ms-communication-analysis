@@ -2,9 +2,10 @@ package apps
 
 import (
 	"context"
-	"log"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // TODO: improve .proto and grpc files structure
@@ -23,9 +24,6 @@ func NewGRPCServer(c Creator, rg ReportGenerator, dpg ProductByDiscountGetter) G
 }
 
 func (s GRPCServer) Create(ctx context.Context, request *CreateProductRequest) (*CreateProductResponse, error) {
-	log.Default().Println("create product called with request: ", request)
-
-	// TODO: validate use case correct apply here
 	i := domain.Product{
 		Name:              request.Name,
 		SKU:               request.Sku,
@@ -39,8 +37,7 @@ func (s GRPCServer) Create(ctx context.Context, request *CreateProductRequest) (
 
 	o, err := s.c.Create(ctx, i)
 	if err != nil {
-		log.Default().Println("error on creating use case", err.Error())
-		return &CreateProductResponse{}, err
+		return &CreateProductResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &CreateProductResponse{
@@ -60,7 +57,12 @@ func (s GRPCServer) Create(ctx context.Context, request *CreateProductRequest) (
 }
 
 func (s GRPCServer) Report(ctx context.Context, in *EmptyRequest) (*GenerateReportResponse, error) {
-	return &GenerateReportResponse{}, nil
+	o, err := s.rg.GenerateReport(ctx)
+	if err != nil {
+		return &GenerateReportResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &GenerateReportResponse{FileName: o}, nil
 }
 
 func (s GRPCServer) GetByDiscount(ctx context.Context, in *EmptyRequest) (*GetByDiscountResponse, error) {
