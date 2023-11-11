@@ -66,7 +66,32 @@ func (s GRPCServer) Report(ctx context.Context, in *EmptyRequest) (*GenerateRepo
 }
 
 func (s GRPCServer) GetByDiscount(ctx context.Context, in *EmptyRequest) (*GetByDiscountResponse, error) {
-	return &GetByDiscountResponse{}, nil
+	o, err := s.dpg.GetByDiscount(ctx)
+	if err != nil {
+		return &GetByDiscountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	ps := make([]*Product, 0)
+	for _, v := range o {
+		p := &Product{
+			Id:                v.ID,
+			Name:              v.Name,
+			Sku:               v.SKU,
+			SellerName:        v.SellerName,
+			Price:             float32(v.Price),
+			AvailableDiscount: float32(v.AvailableDiscount),
+			AvailableQuantity: int32(v.AvailableQuantity),
+			SalesQuantity:     int32(v.SalesQuantity),
+			Active:            v.Active,
+			DiscountApplied:   v.DiscountApplied,
+			CreatedAt:         v.CreatedAt.String(),
+			UpdatedAt:         v.UpdatedAt.String(),
+		}
+
+		ps = append(ps, p)
+	}
+
+	return &GetByDiscountResponse{Products: ps}, nil
 }
 
 // TODO: validate function definition and it's utility
