@@ -3,7 +3,6 @@ package apps
 import (
 	"context"
 	"log"
-	"net/http"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"github.com/gofiber/fiber/v2"
@@ -40,10 +39,10 @@ func (s *SetupApp) Routes(a *fiber.App) {
 func (s *SetupApp) getProductsCount(c *fiber.Ctx) error {
 	o, err := s.d.Count(context.Background())
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(http.StatusOK).JSON(o)
+	return c.Status(fiber.StatusOK).JSON(o)
 }
 
 func (s *SetupApp) generateProducts(c *fiber.Ctx) error {
@@ -63,16 +62,16 @@ func (s *SetupApp) generateProducts(c *fiber.Ctx) error {
 	}
 
 	if err := s.d.BatchCreate(s.ctx, p); err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(http.StatusNoContent).JSON(nil)
+	return c.Status(fiber.StatusNoContent).JSON(nil)
 }
 
 func (s *SetupApp) dropProducts(c *fiber.Ctx) error {
 	if err := s.d.DeleteAll(context.Background()); err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(http.StatusNoContent).JSON(nil)
+	return c.Status(fiber.StatusNoContent).JSON(nil)
 }

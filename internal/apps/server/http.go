@@ -2,7 +2,6 @@ package apps
 
 import (
 	"context"
-	"net/http"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"github.com/gofiber/fiber/v2"
@@ -30,9 +29,7 @@ func (h *HttpApp) Routes(a *fiber.App) {
 }
 
 func (h *HttpApp) createProduct(c *fiber.Ctx) error {
-	var (
-		product domain.Product
-	)
+	var product domain.Product
 	if err := c.BodyParser(&product); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
@@ -42,7 +39,7 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(http.StatusOK).JSON(Return{Result: o})
+	return c.Status(fiber.StatusOK).JSON(Return{Result: o})
 }
 
 func (h *HttpApp) getReport(c *fiber.Ctx) error {
@@ -51,7 +48,7 @@ func (h *HttpApp) getReport(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(http.StatusOK).JSON(Return{Result: o})
+	return c.Status(fiber.StatusOK).JSON(Return{Result: o})
 }
 
 // TODO: test get by applied discount endpoint
@@ -61,5 +58,5 @@ func (h *HttpApp) getByAppliedDiscount(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(http.StatusOK).JSON(Return{Result: o})
+	return c.Status(fiber.StatusOK).JSON(Return{Result: o})
 }

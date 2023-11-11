@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 
 	i "github.com/RafaelEmery/performance-analysis-server/internal"
-	a "github.com/RafaelEmery/performance-analysis-server/internal/apps"
+	a "github.com/RafaelEmery/performance-analysis-server/internal/apps/server"
 	u "github.com/RafaelEmery/performance-analysis-server/internal/usecases"
 	"github.com/gofiber/fiber/v2"
 
@@ -90,8 +90,8 @@ func main() {
 		app := fiber.New()
 		setupApp := a.NewSetupApp(context.Background(), r)
 		setupApp.Routes(app)
-		log.Default().Println("setup application working")
 
+		log.Default().Println("setup application working")
 		app.Listen(fmt.Sprintf(":%s", env.AppPorts.Setup))
 	}
 	if flag.Arg(0) == grpcFlag {
@@ -114,10 +114,10 @@ func main() {
 		app := fiber.New()
 		httpApp := a.NewHttpApp(context.Background(), c, rg, dpg)
 		httpApp.Routes(app)
-		log.Default().Println("HTTP endpoints working")
 
+		log.Default().Println("HTTP endpoints working")
 		app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
 	} else {
-		log.Fatalf("can't run application %s - please provide valid flag (setup|http|grpc).", flag.Arg(0))
+		log.Fatalf("can't run application %s - please provide valid flag (app=setup|http|grpc).", flag.Arg(0))
 	}
 }
