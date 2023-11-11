@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -19,10 +20,17 @@ import (
 	_ "github.com/lib/pq"                 // Load postgres connection
 )
 
+const (
+	setupFlag = "setup"
+	httpFlag  = "http"
+	grpcFlag  = "grpc"
+)
+
 type Env struct {
 	AppPorts struct {
-		HTTP string `env:"HTTP_APP_PORT"`
-		GRPC string `env:"GRPC_APP_PORT"`
+		Setup string `env:"SETUP_APP_PORT"`
+		HTTP  string `env:"HTTP_APP_PORT"`
+		GRPC  string `env:"GRPC_APP_PORT"`
 	}
 	DB struct {
 		Driver   string `env:"DB_DRIVER"`
@@ -70,36 +78,46 @@ func main() {
 	}
 
 	r := i.NewRepository(db)
-	app := fiber.New()
 
 	c := u.NewCreateUseCase(r)
 	rg := u.NewReportUseCase(r)
 	dpg := u.NewGetByDiscountUseCase(r)
 
-	// TODO: use flags commands to specify which server is to run
-	// TODO: separate main files to HTTP app and gRPC app
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", env.AppPorts.GRPC))
-	if err != nil {
-		log.Fatal(err)
+	flag.Parse()
+	log.Default().Println("running app by flag", flag.Arg(0))
+
+	if flag.Arg(0) == setupFlag {
+		app := fiber.New()
+		setupApp := a.NewSetupApp(context.Background(), r)
+		setupApp.Routes(app)
+		log.Default().Println("setup application working")
+
+		app.Listen(fmt.Sprintf(":%s", env.AppPorts.Setup))
 	}
+	if flag.Arg(0) == grpcFlag {
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%s", env.AppPorts.GRPC))
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	s := grpc.NewServer()
-	productHandlerServer := a.NewGRPCServer(c, rg, dpg)
+		s := grpc.NewServer()
+		productHandlerServer := a.NewGRPCServer(c, rg, dpg)
 
-	a.RegisterProductHandlerServer(s, productHandlerServer)
+		a.RegisterProductHandlerServer(s, productHandlerServer)
 
-	log.Printf("grpc server listening at %v", lis.Addr())
-	if err = s.Serve(lis); err != nil {
-		log.Fatal(err)
+		log.Printf("grpc server listening at %v", lis.Addr())
+		if err = s.Serve(lis); err != nil {
+			log.Fatal(err)
+		}
 	}
+	if flag.Arg(0) == httpFlag {
+		app := fiber.New()
+		httpApp := a.NewHttpApp(context.Background(), c, rg, dpg)
+		httpApp.Routes(app)
+		log.Default().Println("HTTP endpoints working")
 
-	setupApp := a.NewSetupApp(context.Background(), r)
-	setupApp.Routes(app)
-	log.Default().Println("setup application working")
-
-	httpApp := a.NewHttpApp(context.Background(), c, rg, dpg)
-	httpApp.Routes(app)
-	log.Default().Println("HTTP endpoints working")
-
-	app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
+		app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
+	} else {
+		log.Fatalf("can't run application %s - please provide valid flag (setup|http|grpc).", flag.Arg(0))
+	}
 }

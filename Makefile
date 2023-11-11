@@ -1,6 +1,7 @@
+# Usage: make run app=setup|http|grpc
 run: 
 	@echo "Running..."
-	@go run cmd/main.go
+	@go run cmd/main.go ${app}
 
 deps:
 	go mod download
