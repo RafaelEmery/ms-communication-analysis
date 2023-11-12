@@ -27,3 +27,7 @@ proto-generate:
 
 remove-temporary-files:
 	@rm -rf .tmp/*
+
+# Usage make load-testing
+load-testing:
+	locust --host=http://localhost:3002
