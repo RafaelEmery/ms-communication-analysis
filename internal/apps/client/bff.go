@@ -13,6 +13,7 @@ import (
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	apps "github.com/RafaelEmery/performance-analysis-server/internal/apps/server"
 	"github.com/gofiber/fiber/v2"
+	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -20,10 +21,16 @@ import (
 const (
 	httpMethod            = "http"
 	grpcMethod            = "grpc"
+	rabbitMQMethod        = "rabbitmq"
 	createResource        = "create"
 	reportResource        = "report"
 	getByDiscountResource = "getByDiscount"
 )
+
+type Message struct {
+	Content  string            `json:"content"`
+	Metadata map[string]string `json:"metadata"`
+}
 
 type InteractionData struct {
 	Resource            string `json:"resource"`
@@ -32,12 +39,14 @@ type InteractionData struct {
 }
 
 type BFFApp struct {
-	HTTPBaseURL    string
-	GRPCServerHost string
+	HTTPBaseURL     string
+	GRPCServerHost  string
+	RabbitMQChannel *amqp.Channel
+	RabbitMQQueue   amqp.Queue
 }
 
-func NewBFFApp(h string, g string) BFFApp {
-	return BFFApp{HTTPBaseURL: h, GRPCServerHost: g}
+func NewBFFApp(h, g string, ch *amqp.Channel, q amqp.Queue) BFFApp {
+	return BFFApp{HTTPBaseURL: h, GRPCServerHost: g, RabbitMQChannel: ch, RabbitMQQueue: q}
 }
 
 func (b *BFFApp) Routes(a *fiber.App) {
@@ -62,7 +71,7 @@ func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData) (string, erro
 	var totalStart time.Time
 
 	if data.CommunicationMethod == httpMethod {
-		endpoint, method := b.getRequestData(data.Resource)
+		endpoint, method := getRequestData(data.Resource, b.HTTPBaseURL)
 
 		totalStart = time.Now()
 		for i := 0; i < data.RequestQuantity; i++ {
@@ -100,24 +109,49 @@ func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData) (string, erro
 			log.Default().Printf("[%s] %s - %s", code, strings.ToUpper(string(data.Resource[0]))+data.Resource[1:], elapsed)
 		}
 	}
+	if data.CommunicationMethod == rabbitMQMethod {
+		for i := 0; i < data.RequestQuantity; i++ {
+			jsonBody, err := getMessageBody(data.Resource)
+			if err != nil {
+				log.Default().Println(err)
+				continue
+			}
+			if err := b.RabbitMQChannel.Publish(
+				"",                   // Exchange
+				b.RabbitMQQueue.Name, // Routing key (nome da fila)
+				false,                // Mandatory
+				false,                // Immediate
+				amqp.Publishing{
+					ContentType: "application/json",
+					Body:        jsonBody,
+					Headers: amqp.Table{
+						"resource": data.Resource,
+					},
+				}); err != nil {
+				log.Default().Println(err)
+				continue
+			}
+
+		}
+	}
 
 	return time.Since(totalStart).String(), nil
 }
 
-func (b *BFFApp) getRequestData(resource string) (string, string) {
+func getRequestData(resource, baseURL string) (string, string) {
 	var (
 		endpoint      string
 		requestMethod string
 	)
 	switch resource {
 	case createResource:
-		endpoint = b.HTTPBaseURL + "/products"
+		endpoint = baseURL + "/products"
 		requestMethod = http.MethodPost
 	case reportResource:
-		endpoint = b.HTTPBaseURL + "/products/report"
+		endpoint = baseURL + "/products/report"
 		requestMethod = http.MethodGet
 	case getByDiscountResource:
-		endpoint = b.HTTPBaseURL + "/products/discount"
+		endpoint = baseURL + "/products/discount"
 		requestMethod = http.MethodGet
 	}
 
@@ -175,6 +209,7 @@ func doProcedureCall(ctx context.Context, resource string, client apps.ProductHa
 	return getProcedureCallCode(ctx), err
 }
 
+// TODO: procedure call code is not working
 func getProcedureCallCode(ctx context.Context) string {
 	md, ok := metadata.FromOutgoingContext(ctx)
 	if !ok {
@@ -185,4 +220,32 @@ func getProcedureCallCode(ctx context.Context) string {
 		return "not_found"
 	}
 	return statusCodes[0]
+}
+
+func getMessageBody(resource string) ([]byte, error) {
+	strContent := ""
+	if resource == createResource {
+		var product domain.Product
+
+		content, err := json.Marshal(product.Fake())
+		if err != nil {
+			return []byte{}, err
+		}
+
+		strContent = string(content)
+	}
+
+	m := Message{
+		Content: strContent,
+		Metadata: map[string]string{
+			"resource": resource,
+		},
+	}
+
+	body, err := json.Marshal(m)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return body, nil
 }

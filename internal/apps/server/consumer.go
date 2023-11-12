@@ -13,7 +13,7 @@ import (
 const (
 	createResource        = "create"
 	reportResource        = "report"
-	getByDiscountResource = "get_by_discount"
+	getByDiscountResource = "getByDiscount"
 )
 
 type Message struct {
@@ -37,11 +37,6 @@ func (c Consumer) Start(ctx context.Context, ch *amqp.Channel) {
 		msgs, err := ch.Consume(c.q.Name, "", true, false, false, false, nil)
 		if err != nil {
 			log.Fatalf("could not consume %s", err.Error())
-		}
-
-		if len(msgs) == 0 {
-			log.Println("no messages")
-			continue
 		}
 
 		for msg := range msgs {
