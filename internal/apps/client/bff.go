@@ -33,9 +33,8 @@ type Message struct {
 }
 
 type InteractionData struct {
-	Resource            string `json:"resource"`
-	CommunicationMethod string `json:"communication_method"`
-	RequestQuantity     int    `json:"request_quantity"`
+	Resource        string `json:"resource"`
+	RequestQuantity int    `json:"request_quantity"`
 }
 
 type BFFApp struct {
@@ -50,27 +49,56 @@ func NewBFFApp(h, g string, ch *amqp.Channel, q amqp.Queue) BFFApp {
 }
 
 func (b *BFFApp) Routes(a *fiber.App) {
-	a.Post("/interact", b.interactWithServer)
+	v1 := a.Group("/interact")
+	v1.Post("/http", b.interactWithHTTPServer)
+	v1.Post("/grpc", b.interactWithGRPCServer)
+	v1.Post("/rabbitmq", b.interactWithRabbitMQ)
 }
 
-func (b *BFFApp) interactWithServer(c *fiber.Ctx) error {
+func (b *BFFApp) interactWithHTTPServer(c *fiber.Ctx) error {
 	var data InteractionData
 	if err := c.BodyParser(&data); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-	o, err := b.handleMethods(c, data)
+	o, err := b.handleMethods(c, data, httpMethod)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.SendString(fmt.Sprintf("[%s] %d req for %s | %s", o, data.RequestQuantity, data.Resource, data.CommunicationMethod))
+	return c.SendString(fmt.Sprintf("[%s] %d req for %s", o, data.RequestQuantity, data.Resource))
 }
 
-func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData) (string, error) {
-	log.Default().Printf("\n%s method on %s resource\n\n", data.CommunicationMethod, data.Resource)
+func (b *BFFApp) interactWithGRPCServer(c *fiber.Ctx) error {
+	var data InteractionData
+	if err := c.BodyParser(&data); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	o, err := b.handleMethods(c, data, grpcMethod)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendString(fmt.Sprintf("[%s] %d req for %s", o, data.RequestQuantity, data.Resource))
+}
+
+func (b *BFFApp) interactWithRabbitMQ(c *fiber.Ctx) error {
+	var data InteractionData
+	if err := c.BodyParser(&data); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	o, err := b.handleMethods(c, data, rabbitMQMethod)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendString(fmt.Sprintf("[%s] %d req for %s", o, data.RequestQuantity, data.Resource))
+}
+
+func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData, method string) (string, error) {
+	log.Default().Printf("[%d req] %s method on %s resource\n", data.RequestQuantity, method, data.Resource)
 	var totalStart time.Time
 
-	if data.CommunicationMethod == httpMethod {
+	if method == httpMethod {
 		endpoint, method := getRequestData(data.Resource, b.HTTPBaseURL)
 
 		totalStart = time.Now()
@@ -87,7 +115,7 @@ func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData) (string, erro
 			log.Default().Printf("[%d] %s - %s", resp.StatusCode, endpoint, elapsed)
 		}
 	}
-	if data.CommunicationMethod == grpcMethod {
+	if method == grpcMethod {
 		conn, err := grpc.Dial(b.GRPCServerHost, grpc.WithInsecure())
 		if err != nil {
 			return "", err
@@ -109,7 +137,7 @@ func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData) (string, erro
 			log.Default().Printf("[%s] %s - %s", code, strings.ToUpper(string(data.Resource[0]))+data.Resource[1:], elapsed)
 		}
 	}
-	if data.CommunicationMethod == rabbitMQMethod {
+	if method == rabbitMQMethod {
 		for i := 0; i < data.RequestQuantity; i++ {
 			jsonBody, err := getMessageBody(data.Resource)
 			if err != nil {

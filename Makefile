@@ -1,4 +1,4 @@
-# Usage: make run app=setup|http|grpc|rabbitmq
+# Usage: make server-run app=setup|http|grpc|rabbitmq
 server-run: 
 	@echo "Running..."
 	@go run cmd/server/main.go ${app}

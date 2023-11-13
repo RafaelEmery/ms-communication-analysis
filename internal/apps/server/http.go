@@ -2,6 +2,7 @@ package apps
 
 import (
 	"context"
+	"log"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"github.com/gofiber/fiber/v2"
@@ -29,6 +30,7 @@ func (h *HttpApp) Routes(a *fiber.App) {
 }
 
 func (h *HttpApp) createProduct(c *fiber.Ctx) error {
+	log.Printf("called http endpoint %s", string(c.Request().URI().Path()))
 	var product domain.Product
 	if err := c.BodyParser(&product); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -43,6 +45,7 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 }
 
 func (h *HttpApp) getReport(c *fiber.Ctx) error {
+	log.Printf("called http endpoint %s", string(c.Request().URI().Path()))
 	o, err := h.rg.GenerateReport(c.Context())
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -53,6 +56,7 @@ func (h *HttpApp) getReport(c *fiber.Ctx) error {
 
 // TODO: test get by applied discount endpoint
 func (h *HttpApp) getByAppliedDiscount(c *fiber.Ctx) error {
+	log.Printf("called http endpoint %s", string(c.Request().URI().Path()))
 	o, err := h.pg.GetByDiscount(c.Context())
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
