@@ -90,10 +90,14 @@ func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData, method string
 
 	totalStart := time.Now()
 	if method == httpMethod {
-		HandleHTTP(b.HTTPBaseURL, data)
+		if err := HandleHTTP(b.HTTPBaseURL, data); err != nil {
+			return "", err
+		}
 	}
 	if method == grpcMethod {
-		HandleGRPC(c.Context(), b.GRPCServerHost, data)
+		if err := HandleGRPC(c.Context(), b.GRPCServerHost, data); err != nil {
+			return "", err
+		}
 	}
 	if method == rabbitMQMethod {
 		HandleRabbitMQ(b.RabbitMQChannel, b.RabbitMQQueue, data)

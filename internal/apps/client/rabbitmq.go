@@ -8,6 +8,10 @@ import (
 	"github.com/streadway/amqp"
 )
 
+// TODO: some dependencies on rabbitmq approach
+// - Metrify request time
+// - Get consume message error
+// - Async paradigm
 func HandleRabbitMQ(ch *amqp.Channel, q amqp.Queue, data InteractionData) {
 	for i := 0; i < data.RequestQuantity; i++ {
 		jsonBody, err := getMessageBody(data.Resource)

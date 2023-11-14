@@ -9,10 +9,9 @@ import (
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	apps "github.com/RafaelEmery/performance-analysis-server/internal/apps/server"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
-func HandleGRPC(ctx context.Context, host string, data InteractionData) {
+func HandleGRPC(ctx context.Context, host string, data InteractionData) error {
 	conn, err := grpc.Dial(host, grpc.WithInsecure())
 	if err != nil {
 		panic(err)
@@ -26,12 +25,16 @@ func HandleGRPC(ctx context.Context, host string, data InteractionData) {
 		code, err := doProcedureCall(ctx, data.Resource, client)
 		if err != nil {
 			log.Default().Println(err)
-			continue
+			if data.RequestQuantity == 1 {
+				return err
+			}
 		}
 
 		elapsed := time.Since(start).String()
 		log.Default().Printf("[%s] %s - %s", code, strings.ToUpper(string(data.Resource[0]))+data.Resource[1:], elapsed)
 	}
+
+	return nil
 }
 
 func doProcedureCall(ctx context.Context, resource string, client apps.ProductHandlerClient) (string, error) {
@@ -62,18 +65,5 @@ func doProcedureCall(ctx context.Context, resource string, client apps.ProductHa
 		_, err = client.GetByDiscount(ctx, req)
 	}
 
-	return getProcedureCallCode(ctx), err
-}
-
-// TODO: procedure call code is not working
-func getProcedureCallCode(ctx context.Context) string {
-	md, ok := metadata.FromOutgoingContext(ctx)
-	if !ok {
-		return "not_found"
-	}
-	statusCodes, ok := md["grpc-status"]
-	if !ok {
-		return "not_found"
-	}
-	return statusCodes[0]
+	return "ok", err
 }

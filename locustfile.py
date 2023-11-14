@@ -10,7 +10,7 @@ class ClientBFFUser(HttpUser):
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": "create",
+            "resource": "getByDiscount",
             "request_quantity": 1
         }
 
@@ -27,7 +27,7 @@ class ClientBFFUser(HttpUser):
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": "create",
+            "resource": "getByDiscount",
             "request_quantity": 1
         }
 
@@ -44,7 +44,7 @@ class ClientBFFUser(HttpUser):
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": "create",
+            "resource": "getByDiscount",
             "request_quantity": 1
         }
 

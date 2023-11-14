@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,7 +12,9 @@ import (
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 )
 
-func HandleHTTP(baseURL string, data InteractionData) {
+var ErrRequestFailed = errors.New("request failed")
+
+func HandleHTTP(baseURL string, data InteractionData) error {
 	endpoint, method := getRequestData(data.Resource, baseURL)
 
 	for i := 0; i < data.RequestQuantity; i++ {
@@ -19,6 +22,9 @@ func HandleHTTP(baseURL string, data InteractionData) {
 		resp, err := doRequest(endpoint, method)
 		if err != nil {
 			log.Default().Println(err)
+			if data.RequestQuantity == 1 {
+				return err
+			}
 			continue
 		}
 		defer resp.Body.Close()
@@ -26,6 +32,8 @@ func HandleHTTP(baseURL string, data InteractionData) {
 		elapsed := time.Since(start).String()
 		log.Default().Printf("[%d] %s - %s", resp.StatusCode, endpoint, elapsed)
 	}
+
+	return nil
 }
 
 func getRequestData(resource, baseURL string) (string, string) {
@@ -49,6 +57,9 @@ func getRequestData(resource, baseURL string) (string, string) {
 }
 
 func doRequest(endpoint, method string) (*http.Response, error) {
+	var r *http.Response
+	var err error
+
 	if method == http.MethodPost {
 		var product domain.Product
 
@@ -58,12 +69,21 @@ func doRequest(endpoint, method string) (*http.Response, error) {
 			return nil, err
 		}
 		body := bytes.NewBuffer(payload)
+		r, err = http.Post(endpoint, "application/json", body)
+		if r.StatusCode != http.StatusOK {
+			return nil, ErrRequestFailed
+		}
 
-		return http.Post(endpoint, "application/json", body)
+		return r, err
 	}
 	if method == http.MethodGet {
-		return http.Get(endpoint)
-	}
+		r, err = http.Get(endpoint)
+		if r.StatusCode != http.StatusOK {
+			return nil, ErrRequestFailed
+		}
 
-	return nil, fmt.Errorf("the method %s is not allowed", method)
+		return r, err
+	} else {
+		return nil, fmt.Errorf("the method %s is not allowed", method)
+	}
 }
