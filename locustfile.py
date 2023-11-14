@@ -3,6 +3,7 @@ from locust import HttpUser, task
 class ClientBFFUser(HttpUser):
     # TODO: understand wait_time function
     # wait_time = between(1, 3)
+    common_resource = "create"
 
     @task
     def do_client_server_interaction_http(self):
@@ -10,7 +11,7 @@ class ClientBFFUser(HttpUser):
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": "getByDiscount",
+            "resource": self.common_resource,
             "request_quantity": 1
         }
 
@@ -27,7 +28,7 @@ class ClientBFFUser(HttpUser):
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": "getByDiscount",
+            "resource": self.common_resource,
             "request_quantity": 1
         }
 
@@ -44,7 +45,7 @@ class ClientBFFUser(HttpUser):
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": "getByDiscount",
+            "resource": self.common_resource,
             "request_quantity": 1
         }
 
