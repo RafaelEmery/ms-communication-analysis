@@ -3,13 +3,19 @@ package client
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"github.com/streadway/amqp"
 )
 
+type Message struct {
+	Content  string            `json:"content"`
+	SentAt   time.Time         `json:"sent_at"`
+	Metadata map[string]string `json:"metadata"`
+}
+
 // TODO: some dependencies on rabbitmq approach
-// - Metrify request time
 // - Get consume message error
 // - Async paradigm
 func HandleRabbitMQ(ch *amqp.Channel, q amqp.Queue, data InteractionData) {
@@ -52,6 +58,7 @@ func getMessageBody(resource string) ([]byte, error) {
 
 	m := Message{
 		Content: strContent,
+		SentAt:  time.Now(),
 		Metadata: map[string]string{
 			"resource": resource,
 		},

@@ -19,6 +19,7 @@ func NewReportUseCase(g ProductGetter) reportUseCase {
 	return reportUseCase{g: g}
 }
 
+// TODO: improvement - do not generate file on .tmp and then return bytes array
 func (u reportUseCase) GenerateReport(ctx context.Context) (string, error) {
 	p, err := u.g.Get(ctx)
 	if err != nil {

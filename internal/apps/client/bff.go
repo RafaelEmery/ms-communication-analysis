@@ -18,11 +18,6 @@ const (
 	getByDiscountResource = "getByDiscount"
 )
 
-type Message struct {
-	Content  string            `json:"content"`
-	Metadata map[string]string `json:"metadata"`
-}
-
 type InteractionData struct {
 	Resource        string `json:"resource"`
 	RequestQuantity int    `json:"request_quantity"`

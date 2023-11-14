@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"github.com/streadway/amqp"
@@ -18,6 +19,7 @@ const (
 
 type Message struct {
 	Content  string            `json:"content"`
+	SentAt   time.Time         `json:"sent_at"`
 	Metadata map[string]string `json:"metadata"`
 }
 
@@ -56,6 +58,8 @@ func (c Consumer) Start(ctx context.Context, ch *amqp.Channel) {
 				log.Default().Printf("error on processing message %s", err.Error())
 				continue
 			}
+
+			log.Default().Printf("message sent as processed in [%s]", time.Since(m.SentAt).String())
 		}
 	}
 }
@@ -68,26 +72,20 @@ func (c Consumer) handleUseCases(ctx context.Context, resource, content string) 
 			return err
 		}
 
-		o, err := c.c.Create(ctx, p)
+		_, err := c.c.Create(ctx, p)
 		if err != nil {
 			return err
 		}
-
-		log.Default().Printf("successfully created with id %s", o.ID)
 	case reportResource:
-		o, err := c.rg.GenerateReport(ctx)
+		_, err := c.rg.GenerateReport(ctx)
 		if err != nil {
 			return err
 		}
-
-		log.Default().Printf("successfully generated with name %s", o)
 	case getByDiscountResource:
-		o, err := c.pdg.GetByDiscount(ctx)
+		_, err := c.pdg.GetByDiscount(ctx)
 		if err != nil {
 			return err
 		}
-
-		log.Default().Printf("successfully returned with count %d", len(o))
 	default:
 		return fmt.Errorf("invalid resource %s", resource)
 	}
