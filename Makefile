@@ -8,8 +8,10 @@ client-run:
 	@go run cmd/client/main.go
 
 # TODO: fix make build - make: 'build' está atualizado.
-build:
+server-build:
 	@go build -o build/client cmd/client/main.go
+
+client-build:
 	@go build -o build/server cmd/server/main.go
 
 deps:
@@ -23,8 +25,15 @@ docker-server-build:
 	docker build -t server -f cmd/server/Dockerfile .
 
 # Usage: make docker-server-run flag=setup|http|grpc|rabbitmq
+# TODO: fix flag on server main.go and dockerfile
 docker-server-run:
-	docker run -p 8081:8081 server ${flag}
+	docker run -p 8081:8081 server 
+
+docker-client-build:
+	docker build -t tcc-client-application -f cmd/client/Dockerfile .
+
+docker-client-run:
+	docker run -p 8082:8082 tcc-client-application
 
 stop:
 	@docker-compose down
@@ -40,6 +49,5 @@ proto-generate:
 remove-temporary-files:
 	@rm -rf .tmp/*
 
-# Usage make load-testing
 load-testing:
 	locust --host=http://localhost:3002
