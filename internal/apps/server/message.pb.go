@@ -20,7 +20,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// TODO: validate the request without body
 type EmptyRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -60,7 +59,6 @@ func (*EmptyRequest) Descriptor() ([]byte, []int) {
 }
 
 // TODO: what means all the = <number>
-// TODO: studies about RPC messages
 type CreateProductRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

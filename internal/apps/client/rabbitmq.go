@@ -15,7 +15,7 @@ type Message struct {
 	Metadata map[string]string `json:"metadata"`
 }
 
-// TODO: some dependencies on rabbitmq approach
+// Some dependencies on rabbitmq approach
 // - Get consume message error
 // - Async paradigm
 func HandleRabbitMQ(ch *amqp.Channel, q amqp.Queue, data InteractionData) {

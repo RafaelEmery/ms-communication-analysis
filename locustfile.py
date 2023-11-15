@@ -5,6 +5,9 @@ class ClientBFFUser(HttpUser):
     # wait_time = between(1, 3)
     common_resource = "create"
 
+    # TODO: set request quantity threshold to adapt to experiment workload levels
+    # TODO: set order to tasks to test each application individually
+
     @task
     def do_client_server_interaction_http(self):
         headers = {

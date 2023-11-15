@@ -54,7 +54,6 @@ func (h *HttpApp) getReport(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(Return{Result: o})
 }
 
-// TODO: test get by applied discount endpoint
 func (h *HttpApp) getByAppliedDiscount(c *fiber.Ctx) error {
 	log.Printf("called http endpoint %s", string(c.Request().URI().Path()))
 	o, err := h.pg.GetByDiscount(c.Context())

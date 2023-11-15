@@ -75,6 +75,7 @@ func connectDatabase(env *Env) (*sql.DB, error) {
 	return db, nil
 }
 
+// TODO: dockerize all three applications with different dockerfiles for each flag passed
 func main() {
 	env, err := getEnv()
 	if err != nil {

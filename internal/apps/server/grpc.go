@@ -8,11 +8,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// TODO: improve .proto and grpc files structure
-// TODO: change gRPC file test function name
-// TODO: define error message as struct on .proto and grpc files
-
 type GRPCServer struct {
+	// TODO: understand the HandlerServer below
 	// s   p.UnimplementedProductHandlerServer
 	c   Creator
 	rg  ReportGenerator
