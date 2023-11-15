@@ -67,6 +67,7 @@ func connectDatabase(env *Env) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// TODO: validate db.Ping()
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}
@@ -93,6 +94,7 @@ func main() {
 	rg := u.NewReportUseCase(r)
 	dpg := u.NewGetByDiscountUseCase(r)
 
+	// TODO: set name to flags as -type to use with docker container
 	flag.Parse()
 	log.Default().Println("running app by flag", flag.Arg(0))
 

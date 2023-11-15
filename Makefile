@@ -7,12 +7,24 @@ client-run:
 	@echo "Running..."
 	@go run cmd/client/main.go
 
+# TODO: fix make build - make: 'build' está atualizado.
+build:
+	@go build -o build/client cmd/client/main.go
+	@go build -o build/server cmd/server/main.go
+
 deps:
 	go mod download
 	go mod tidy
 
 start:
 	@docker-compose up -d
+
+docker-server-build:
+	docker build -t server -f cmd/server/Dockerfile .
+
+# Usage: make docker-server-run flag=setup|http|grpc|rabbitmq
+docker-server-run:
+	docker run -p 8081:8081 server ${flag}
 
 stop:
 	@docker-compose down
