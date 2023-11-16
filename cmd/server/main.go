@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	goenv "github.com/Netflix/go-env"
 	"github.com/streadway/amqp"
@@ -67,11 +68,23 @@ func connectDatabase(env *Env) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO: validate db.Ping() on container
-	if err = db.Ping(); err != nil {
-		return nil, err
+
+	log.Println("db - ", db)
+
+	for {
+		time.Sleep(5 * time.Second)
+		if err = db.Ping(); err != nil {
+			log.Println("error on db.Ping() function - ", err)
+			continue
+		}
+		log.Default().Println("database connected")
 	}
-	log.Default().Println("database connected")
+	// TODO: validate db.Ping() on container
+	// if err = db.Ping(); err != nil {
+	// 	log.Println("error on db.Ping() function!")
+	// 	return nil, err
+	// }
+	// log.Default().Println("database connected")
 
 	return db, nil
 }
@@ -83,6 +96,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var methodFlag string
+	flag.StringVar(&methodFlag, "type", "", "the type of server to run (setup|http|grpc|rabbitmq)")
+	flag.Parse()
+	log.Default().Printf("running app by flag - %s", methodFlag)
+
 	db, err := connectDatabase(env)
 	if err != nil {
 		log.Fatal(err)
@@ -93,11 +111,6 @@ func main() {
 	c := u.NewCreateUseCase(r)
 	rg := u.NewReportUseCase(r)
 	dpg := u.NewGetByDiscountUseCase(r)
-
-	var methodFlag string
-	flag.StringVar(&methodFlag, "type", "", "the type of server to run (setup|http|grpc|rabbitmq)")
-	flag.Parse()
-	log.Default().Println("running app by flag", flag.Arg(0))
 
 	if methodFlag == setupFlag {
 		app := fiber.New()

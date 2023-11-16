@@ -1,6 +1,13 @@
 version: "3.5"
 
 services:
+  app:
+    image: tcc-server-application
+    container_name: tcc_server_application
+    depends_on:
+      - postgres
+    networks:
+      - tcc_network
   postgres:
     image: postgres:latest
     container_name: tcc_server_db
@@ -10,6 +17,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${DB_PORT}:5432"
+    networks:
+      - tcc_network
   rabbitmq:
     image: "rabbitmq:3.8-management"
     container_name: tcc_rabbitmq
@@ -19,3 +28,5 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_USER}
+networks:
+    tcc_network:

@@ -7,12 +7,15 @@ client-run:
 	@echo "Running..."
 	@go run cmd/client/main.go
 
-# TODO: fix make build - make: 'build' está atualizado.
+# @cp .env.example build/.env
 server-build:
-	@go build -o build/client cmd/client/main.go
+	@cp .env.example build/.env
+	@go build -o build/tcc-server-application cmd/server/main.go
 
+# @cp .env.example build/.env
 client-build:
-	@go build -o build/server cmd/server/main.go
+	@cp .env.example build/.env
+	@go build -o build/tcc-client-application cmd/client/main.go
 
 deps:
 	go mod download
@@ -22,12 +25,15 @@ start:
 	@docker-compose up -d
 
 docker-server-build:
-	docker build -t server -f cmd/server/Dockerfile .
+	docker build -t tcc-server-application -f cmd/server/Dockerfile .
 
 # Usage: make docker-server-run type=setup|http|grpc|rabbitmq
 # TODO: fix flag on server main.go and dockerfile
 docker-server-run:
-	docker run -p 8081:8081 server 
+	docker run -p 8081:8081 tcc-server-application -type="${type}"
+
+build-and-run:
+	make docker-server-build && make docker-server-run
 
 docker-client-build:
 	docker build -t tcc-client-application -f cmd/client/Dockerfile .

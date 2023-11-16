@@ -9,10 +9,16 @@ RUN make deps
 
 # TODO: adjust to make build correctly
 RUN cp .env.example .env
-RUN go build -o build/server cmd/server/main.go
+RUN make server-build
 
 # TODO: verify which por will run in Postman/Locust
 EXPOSE 8081
 
 # Passing flag to server command and setting http as default
-CMD ["/app/build/server", "-type", "http"]
+# CMD ["/app/build/tcc-server-application", "-type=default-type"]
+
+# ENTRYPOINT definindo o comando padrão
+ENTRYPOINT ["/app/build/tcc-server-application"]
+
+# CMD fornecendo argumentos padrão
+CMD ["-type=default-type"]
