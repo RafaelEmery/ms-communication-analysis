@@ -67,7 +67,7 @@ func connectDatabase(env *Env) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO: validate db.Ping()
+	// TODO: validate db.Ping() on container
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}
@@ -94,11 +94,12 @@ func main() {
 	rg := u.NewReportUseCase(r)
 	dpg := u.NewGetByDiscountUseCase(r)
 
-	// TODO: set name to flags as -type to use with docker container
+	var methodFlag string
+	flag.StringVar(&methodFlag, "type", "", "the type of server to run (setup|http|grpc|rabbitmq)")
 	flag.Parse()
 	log.Default().Println("running app by flag", flag.Arg(0))
 
-	if flag.Arg(0) == setupFlag {
+	if methodFlag == setupFlag {
 		app := fiber.New()
 		setupApp := a.NewSetupApp(context.Background(), r)
 		setupApp.Routes(app)
@@ -106,7 +107,7 @@ func main() {
 		log.Default().Println("setup application working")
 		app.Listen(fmt.Sprintf(":%s", env.AppPorts.Setup))
 	}
-	if flag.Arg(0) == grpcFlag {
+	if methodFlag == grpcFlag {
 		lis, err := net.Listen("tcp", fmt.Sprintf(":%s", env.AppPorts.GRPC))
 		if err != nil {
 			log.Fatal(err)
@@ -122,7 +123,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	if flag.Arg(0) == httpFlag {
+	if methodFlag == httpFlag {
 		app := fiber.New()
 		httpApp := a.NewHttpApp(context.Background(), c, rg, dpg)
 		httpApp.Routes(app)
@@ -130,7 +131,7 @@ func main() {
 		log.Default().Println("HTTP endpoints working")
 		app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
 	}
-	if flag.Arg(0) == rabbitMQFlag {
+	if methodFlag == rabbitMQFlag {
 		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port))
 		if err != nil {
 			log.Fatal(err)
@@ -159,6 +160,6 @@ func main() {
 		log.Printf("consumer running on queue %s", q.Name)
 		consumer.Start(context.Background(), ch)
 	} else {
-		log.Fatalf("can't run application %s - please provide valid flag (app=setup|http|grpc|rabbitmq).", flag.Arg(0))
+		log.Fatalf("can't run application %s - please provide valid flag (app=setup|http|grpc|rabbitmq).", methodFlag)
 	}
 }

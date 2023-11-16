@@ -1,7 +1,7 @@
-# Usage: make server-run app=setup|http|grpc|rabbitmq
+# Usage: make server-run type=setup|http|grpc|rabbitmq
 server-run: 
 	@echo "Running..."
-	@go run cmd/server/main.go ${app}
+	@go run cmd/server/main.go -type="${type}"
 
 client-run: 
 	@echo "Running..."
@@ -24,7 +24,7 @@ start:
 docker-server-build:
 	docker build -t server -f cmd/server/Dockerfile .
 
-# Usage: make docker-server-run flag=setup|http|grpc|rabbitmq
+# Usage: make docker-server-run type=setup|http|grpc|rabbitmq
 # TODO: fix flag on server main.go and dockerfile
 docker-server-run:
 	docker run -p 8081:8081 server 
