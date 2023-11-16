@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -71,7 +72,13 @@ func doRequest(endpoint, method string) (*http.Response, error) {
 		body := bytes.NewBuffer(payload)
 		r, err = http.Post(endpoint, "application/json", body)
 		if r.StatusCode != http.StatusOK {
-			return nil, ErrRequestFailed
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				return nil, ErrRequestFailed
+			}
+
+			bodyString := string(body)
+			return nil, fmt.Errorf("request failed: %s", bodyString)
 		}
 
 		return r, err
@@ -79,7 +86,13 @@ func doRequest(endpoint, method string) (*http.Response, error) {
 	if method == http.MethodGet {
 		r, err = http.Get(endpoint)
 		if r.StatusCode != http.StatusOK {
-			return nil, ErrRequestFailed
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				return nil, ErrRequestFailed
+			}
+
+			bodyString := string(body)
+			return nil, fmt.Errorf("request failed: %s", bodyString)
 		}
 
 		return r, err
