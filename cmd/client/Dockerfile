@@ -7,11 +7,9 @@ COPY . /app
 RUN ls -la
 RUN make deps
 
-# TODO: adjust to make build correctly
 RUN cp .env.example .env
-RUN go build -o build/tcc-client-application cmd/client/main.go
+RUN make client-build
 
-# TODO: verify which por will run in Postman/Locust
-EXPOSE 8082
+EXPOSE 8083
 
 CMD ["/app/build/tcc-client-application"]

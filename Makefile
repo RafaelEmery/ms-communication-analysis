@@ -24,25 +24,11 @@ deps:
 start:
 	@docker-compose up -d
 
-docker-server-build:
-	docker build -t tcc-server-application -f cmd/server/Dockerfile .
-
-# Usage: make docker-server-run type=setup|http|grpc|rabbitmq
-# TODO: fix flag on server main.go and dockerfile
-docker-server-run:
-	docker run -p 8081:8081 tcc-server-application -type="${type}"
-
-build-and-run:
-	make docker-server-build && make docker-server-run
-
-docker-client-build:
-	docker build -t tcc-client-application -f cmd/client/Dockerfile .
-
-docker-client-run:
-	docker run -p 8082:8082 tcc-client-application
-
 stop:
 	@docker-compose down
+
+build-and-start:
+	@docker-compose up --build
 
 restart: 
 	@docker-compose restart

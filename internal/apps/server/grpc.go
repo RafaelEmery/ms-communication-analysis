@@ -2,6 +2,7 @@ package apps
 
 import (
 	"context"
+	"log"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 	"google.golang.org/grpc/codes"
@@ -21,6 +22,7 @@ func NewGRPCServer(c Creator, rg ReportGenerator, dpg ProductByDiscountGetter) G
 }
 
 func (s GRPCServer) Create(ctx context.Context, request *CreateProductRequest) (*CreateProductResponse, error) {
+	log.Default().Println("called grpc method Create")
 	i := domain.Product{
 		Name:              request.Name,
 		SKU:               request.Sku,
@@ -54,6 +56,7 @@ func (s GRPCServer) Create(ctx context.Context, request *CreateProductRequest) (
 }
 
 func (s GRPCServer) Report(ctx context.Context, in *EmptyRequest) (*GenerateReportResponse, error) {
+	log.Default().Println("called grpc method Report")
 	o, err := s.rg.GenerateReport(ctx)
 	if err != nil {
 		return &GenerateReportResponse{}, status.Error(codes.Internal, err.Error())
@@ -63,6 +66,7 @@ func (s GRPCServer) Report(ctx context.Context, in *EmptyRequest) (*GenerateRepo
 }
 
 func (s GRPCServer) GetByDiscount(ctx context.Context, in *EmptyRequest) (*GetByDiscountResponse, error) {
+	log.Default().Println("called grpc method GetByDiscount")
 	o, err := s.dpg.GetByDiscount(ctx)
 	if err != nil {
 		return &GetByDiscountResponse{}, status.Error(codes.Internal, err.Error())

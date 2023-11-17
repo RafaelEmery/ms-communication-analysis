@@ -69,22 +69,12 @@ func connectDatabase(env *Env) (*sql.DB, error) {
 		return nil, err
 	}
 
-	log.Println("db - ", db)
+	time.Sleep(5 * time.Second)
 
-	for {
-		time.Sleep(5 * time.Second)
-		if err = db.Ping(); err != nil {
-			log.Println("error on db.Ping() function - ", err)
-			continue
-		}
-		log.Default().Println("database connected")
+	if err = db.Ping(); err != nil {
+		return nil, err
 	}
-	// TODO: validate db.Ping() on container
-	// if err = db.Ping(); err != nil {
-	// 	log.Println("error on db.Ping() function!")
-	// 	return nil, err
-	// }
-	// log.Default().Println("database connected")
+	log.Default().Println("database connected")
 
 	return db, nil
 }

@@ -74,6 +74,3 @@ class BFFUserTaskSet(TaskSet):
 class BFFUser(HttpUser):
     tasks = [BFFUserTaskSet]
     wait_time = between(1, 3) # Simulate time between tasks
-
-    # TODO: set request quantity threshold to adapt to experiment workload levels
-    # TODO: set order to tasks to test each application individually
