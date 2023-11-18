@@ -10,8 +10,6 @@ RUN make deps
 RUN cp .env.example .env
 RUN make server-build
 
-EXPOSE 8082
-
 ENTRYPOINT ["/app/build/tcc-server-application"]
 
 CMD ["-type=rabbitmq"]

@@ -10,7 +10,7 @@ RUN make deps
 RUN cp .env.example .env
 RUN make server-build
 
-EXPOSE 8080
+EXPOSE 3000
 
 ENTRYPOINT ["/app/build/tcc-server-application"]
 

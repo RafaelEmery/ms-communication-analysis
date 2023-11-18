@@ -10,6 +10,6 @@ RUN make deps
 RUN cp .env.example .env
 RUN make client-build
 
-EXPOSE 8083
+EXPOSE 3002
 
 CMD ["/app/build/tcc-client-application"]

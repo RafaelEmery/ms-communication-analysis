@@ -134,13 +134,14 @@ func main() {
 		app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
 	}
 	if methodFlag == rabbitMQFlag {
-		time.Sleep(5 * time.Second)
-		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port))
+		connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port)
+		log.Default().Println("rabbitMQ connection string: ", connectionString)
+		conn, err := amqp.Dial(connectionString)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer conn.Close()
-		log.Default().Println("rabbitMQ successfully connected: ", conn.IsClosed())
+		log.Default().Println("rabbitMQ successfully connected: ", !conn.IsClosed())
 
 		ch, err := conn.Channel()
 		if err != nil {

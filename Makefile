@@ -30,7 +30,7 @@ stop:
 
 # Usage: make start service=service_name (optional)
 start-with-build:
-	@docker-compose up --build ${service}
+	@docker-compose up -d --build${service}
 
 docker-client-build:
 	docker build -t tcc-client-application -f cmd/client/Dockerfile .

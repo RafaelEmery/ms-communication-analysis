@@ -2,43 +2,6 @@ version: "3.5"
 
 # TODO: change to already builded image when it's finished
 services:
-  bff-app:
-    build:
-      context: ./
-      dockerfile: ./cmd/client/Dockerfile
-    container_name: tcc_client_application
-    ports:
-      - "${BFF_APP_PORT}:3002"
-    depends_on:
-      - http-app
-      - grpc-app
-      - rabbitmq
-  http-app:
-    build:
-      context: ./
-      dockerfile: ./cmd/server/Dockerfile.http
-    container_name: tcc_server_http_application
-    ports:
-      - "${HTTP_APP_PORT}:3000"
-    depends_on:
-      - postgres
-  grpc-app:
-    build:
-      context: ./
-      dockerfile: ./cmd/server/Dockerfile.grpc
-    container_name: tcc_server_grpc_application
-    ports:
-      - "${GRPC_APP_PORT}:3001"
-    depends_on:
-      - postgres
-  rabbitmq-app:
-    build:
-      context: ./
-      dockerfile: ./cmd/server/Dockerfile.rabbitmq
-    container_name: tcc_server_rabbitmq_application
-    depends_on:
-      - postgres
-      - rabbitmq
   postgres:
     image: postgres:latest
     container_name: tcc_server_db
@@ -50,15 +13,59 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my_network
   rabbitmq:
     image: "rabbitmq:3.8-management"
     container_name: tcc_rabbitmq
+    hostname: "rabbitmq"
     ports:
       - "${RABBITMQ_PORT}:5672"
       - "${RABBITMQ_WEB_PORT}:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_USER}
+    networks:
+      - my_network
+  http-app:
+    build:
+      context: ./
+      dockerfile: ./cmd/server/Dockerfile.http
+    container_name: tcc_server_http_application
+    ports:
+      - "${HTTP_APP_PORT}:3000"
+    networks:
+      - my_network
+  grpc-app:
+    build:
+      context: ./
+      dockerfile: ./cmd/server/Dockerfile.grpc
+    container_name: tcc_server_grpc_application
+    ports:
+      - "${GRPC_APP_PORT}:3001"
+    networks:
+      - my_network
+  rabbitmq-app:
+    build:
+      context: ./
+      dockerfile: ./cmd/server/Dockerfile.rabbitmq
+    container_name: tcc_server_rabbitmq_application
+    networks:
+      - my_network
+  bff-app:
+    build:
+      context: ./
+      dockerfile: ./cmd/client/Dockerfile
+    container_name: tcc_client_application
+    ports:
+      - "${BFF_APP_PORT}:3002"
+    networks:
+      - my_network
+    depends_on:
+      - rabbitmq-app
 volumes:
   postgres_data:
     driver: local
+networks:
+  my_network:
+    driver: bridge

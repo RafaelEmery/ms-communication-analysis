@@ -23,6 +23,9 @@ func NewHttpApp(ctx context.Context, c Creator, rg ReportGenerator, pg ProductBy
 }
 
 func (h *HttpApp) Routes(a *fiber.App) {
+	a.Get("/ok", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusOK)
+	})
 	v1 := a.Group("/products")
 	v1.Post("", h.createProduct)
 	v1.Get("/report", h.getReport)
