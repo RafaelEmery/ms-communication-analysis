@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	goenv "github.com/Netflix/go-env"
 	"github.com/RafaelEmery/performance-analysis-server/internal/apps/client"
@@ -12,6 +13,7 @@ import (
 )
 
 type Env struct {
+	Host       string `env:"HOST"`
 	ClientPort string `env:"BFF_APP_PORT"`
 	HTTPPort   string `env:"HTTP_APP_PORT"`
 	GRPCPort   string `env:"GRPC_APP_PORT"`
@@ -40,13 +42,16 @@ func main() {
 	}
 
 	app := fiber.New()
-	httpURL := fmt.Sprintf("http://localhost:%s", env.HTTPPort)
-	grpcHost := fmt.Sprintf("localhost:%s", env.GRPCPort)
+	httpURL := fmt.Sprintf("http://%s:%s", env.Host, env.HTTPPort)
+	grpcHost := fmt.Sprintf("%s:%s", env.Host, env.GRPCPort)
+
+	time.Sleep(5 * time.Second)
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
+	log.Default().Println("rabbitMQ successfully connected: ", conn.IsClosed())
 
 	ch, err := conn.Channel()
 	if err != nil {
@@ -65,6 +70,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// TODO: pass all connections and hosts to BFF app and handle methods/calls only
+
 	bff := client.NewBFFApp(httpURL, grpcHost, ch, q)
 	bff.Routes(app)
 

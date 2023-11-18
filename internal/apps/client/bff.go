@@ -35,6 +35,9 @@ func NewBFFApp(h, g string, ch *amqp.Channel, q amqp.Queue) BFFApp {
 }
 
 func (b *BFFApp) Routes(a *fiber.App) {
+	a.Get("/ok", func(c *fiber.Ctx) error {
+		return c.SendString("OK!")
+	})
 	v1 := a.Group("/interact")
 	v1.Post("/http", b.interactWithHTTPServer)
 	v1.Post("/grpc", b.interactWithGRPCServer)

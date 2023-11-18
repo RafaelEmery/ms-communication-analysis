@@ -21,14 +21,19 @@ deps:
 	go mod download
 	go mod tidy
 
+# Usage: make start service=service_name (optional)
 start:
-	@docker-compose up -d
+	@docker-compose up -d ${service}
 
 stop:
 	@docker-compose down
 
-build-and-start:
-	@docker-compose up --build
+# Usage: make start service=service_name (optional)
+start-with-build:
+	@docker-compose up --build ${service}
+
+docker-client-build:
+	docker build -t tcc-client-application -f cmd/client/Dockerfile .
 
 restart: 
 	@docker-compose restart

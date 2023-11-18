@@ -79,7 +79,6 @@ func connectDatabase(env *Env) (*sql.DB, error) {
 	return db, nil
 }
 
-// TODO: dockerize all three applications with different dockerfiles for each flag passed
 func main() {
 	env, err := getEnv()
 	if err != nil {
@@ -135,11 +134,13 @@ func main() {
 		app.Listen(fmt.Sprintf(":%s", env.AppPorts.HTTP))
 	}
 	if methodFlag == rabbitMQFlag {
+		time.Sleep(5 * time.Second)
 		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port))
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer conn.Close()
+		log.Default().Println("rabbitMQ successfully connected: ", conn.IsClosed())
 
 		ch, err := conn.Channel()
 		if err != nil {

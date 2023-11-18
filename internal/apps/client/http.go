@@ -66,11 +66,13 @@ func doRequest(endpoint, method string) (*http.Response, error) {
 
 		payload, err := json.Marshal(product.Fake())
 		if err != nil {
-			log.Default().Println(err)
 			return nil, err
 		}
 		body := bytes.NewBuffer(payload)
 		r, err = http.Post(endpoint, "application/json", body)
+		if err != nil {
+			return nil, fmt.Errorf("request failed: %s", err.Error())
+		}
 		if r.StatusCode != http.StatusOK {
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -85,6 +87,9 @@ func doRequest(endpoint, method string) (*http.Response, error) {
 	}
 	if method == http.MethodGet {
 		r, err = http.Get(endpoint)
+		if err != nil {
+			return nil, fmt.Errorf("request failed: %s", err.Error())
+		}
 		if r.StatusCode != http.StatusOK {
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {

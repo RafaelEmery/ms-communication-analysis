@@ -20,6 +20,7 @@ func NewReportUseCase(g ProductGetter) reportUseCase {
 }
 
 // TODO: improvement - do not generate file on .tmp and then return bytes array
+// TODO: on docker container, where is this file's located?
 func (u reportUseCase) GenerateReport(ctx context.Context) (string, error) {
 	p, err := u.g.Get(ctx)
 	if err != nil {
