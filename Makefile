@@ -47,4 +47,4 @@ remove-temporary-files:
 	@rm -rf .tmp/*
 
 load-testing:
-	locust --host=http://localhost:3002
+	locust --host=http://0.0.0.0:3002

@@ -1,12 +1,11 @@
 from locust import HttpUser, task, between, TaskSet
 
-class BFFUserTaskSet(TaskSet):
-    def on_start(self):
-        self.common_resource = "create"
-        self.request_count = 0
-        self.request_threshold = 1000
+class BFFUser(HttpUser):
+    common_resource = "create"
+    request_count = 0
+    request_threshold = 1000
 
-    @task(1)
+    @task
     def do_client_server_interaction_http(self):
         headers = {
             "Content-Type": "application/json"
@@ -23,12 +22,11 @@ class BFFUserTaskSet(TaskSet):
         print(f"Status Code: {res.status_code}")
         print(f"Response Content: {res.content}")
         
-        # TODO: fix the quit for threshold
         self.request_count += 1
         if self.request_count >= self.request_threshold:
-            self.user.environment.runner.quit()
-    
-    # @task(2)
+            self.environment.runner.quit()
+
+    # @task()
     # def do_client_server_interaction_grpc(self):
     #     headers = {
     #         "Content-Type": "application/json"
@@ -47,9 +45,9 @@ class BFFUserTaskSet(TaskSet):
 
     #     self.request_count += 1
     #     if self.request_count >= self.request_threshold:
-    #         self.user.environment.runner.quit()
+    #         self.environment.runner.quit()
 
-    # @task(3)
+    # @task()
     # def do_client_server_interaction_rabbit_mq(self):
     #     headers = {
     #         "Content-Type": "application/json"
@@ -68,9 +66,4 @@ class BFFUserTaskSet(TaskSet):
 
     #     self.request_count += 1
     #     if self.request_count >= self.request_threshold:
-    #         self.user.environment.runner.quit()
-
-
-class BFFUser(HttpUser):
-    tasks = [BFFUserTaskSet]
-    wait_time = between(1, 3) # Simulate time between tasks
+    #         self.environment.runner.quit()
