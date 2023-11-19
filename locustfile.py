@@ -3,7 +3,7 @@ from locust import HttpUser, task, between, TaskSet
 class BFFUser(HttpUser):
     common_resource = "create"
     request_count = 0
-    request_threshold = 1000
+    request_threshold = 5000
 
     @task
     def do_client_server_interaction_http(self):
@@ -23,8 +23,9 @@ class BFFUser(HttpUser):
         print(f"Response Content: {res.content}")
         
         self.request_count += 1
-        if self.request_count >= self.request_threshold:
+        if self.request_count > self.request_threshold:
             self.environment.runner.quit()
+            print("request count is above threshold")
 
     # @task()
     # def do_client_server_interaction_grpc(self):

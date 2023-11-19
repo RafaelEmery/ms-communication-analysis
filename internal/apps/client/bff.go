@@ -116,7 +116,7 @@ func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData, method string
 
 	info := InteractionInfo{
 		RequestTime: time.Since(totalStart).String(),
-		MemoryUsage: convertToKB(memStats.Alloc),
+		MemoryUsage: convertToKB(memStats.TotalAlloc),
 	}
 
 	return info, nil

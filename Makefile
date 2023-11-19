@@ -25,6 +25,9 @@ deps:
 start:
 	@docker-compose up -d ${service}
 
+fix-start:
+	@docker-compose up -d bff-app
+
 stop:
 	@docker-compose down
 
@@ -59,4 +62,5 @@ remove-containers-logs:
 
 # Usage: make get-container logs service=backend_service_name repeat=repetition_value
 proccess-log-values:
+	go run cmd/logprocesser/main.go ./logs/bff-app_${repeat}.txt
 	go run cmd/logprocesser/main.go ./logs/${service}_${repeat}.txt

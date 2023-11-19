@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -46,6 +47,9 @@ func (u reportUseCase) GenerateReport(ctx context.Context) (string, error) {
 	}
 
 	if err := m.OutputFileAndClose(fileName); err != nil {
+		return "", err
+	}
+	if err := os.Remove(fileName); err != nil {
 		return "", err
 	}
 

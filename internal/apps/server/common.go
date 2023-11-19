@@ -28,7 +28,7 @@ func logMemStats() {
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
 
-	i := InteractionInfo{MemoryUsage: convertToKB(memStats.Alloc)}
+	i := InteractionInfo{MemoryUsage: convertToKB(memStats.TotalAlloc)}
 	log.Default().Printf("memory - %d (kB)", i.MemoryUsage)
 }
 
