@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 )
@@ -19,7 +18,6 @@ func HandleHTTP(baseURL string, data InteractionData) error {
 	endpoint, method := getRequestData(data.Resource, baseURL)
 
 	for i := 0; i < data.RequestQuantity; i++ {
-		start := time.Now()
 		resp, err := doRequest(endpoint, method)
 		if err != nil {
 			log.Default().Println(err)
@@ -29,9 +27,6 @@ func HandleHTTP(baseURL string, data InteractionData) error {
 			continue
 		}
 		defer resp.Body.Close()
-
-		elapsed := time.Since(start).String()
-		log.Default().Printf("[%d] %s - %s", resp.StatusCode, endpoint, elapsed)
 	}
 
 	return nil

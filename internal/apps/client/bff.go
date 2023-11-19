@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"log"
+	"runtime"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,6 +22,11 @@ const (
 type InteractionData struct {
 	Resource        string `json:"resource"`
 	RequestQuantity int    `json:"request_quantity"`
+}
+
+type InteractionInfo struct {
+	MemoryUsage uint64
+	RequestTime string
 }
 
 type BFFApp struct {
@@ -54,7 +60,9 @@ func (b *BFFApp) interactWithHTTPServer(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.SendString(fmt.Sprintf("[%s] %d req for %s", o, data.RequestQuantity, data.Resource))
+	output := fmt.Sprintf("request time - %s | memory - %d (kB)", o.RequestTime, o.MemoryUsage)
+	log.Println(output)
+	return c.SendString(output)
 }
 
 func (b *BFFApp) interactWithGRPCServer(c *fiber.Ctx) error {
@@ -67,7 +75,9 @@ func (b *BFFApp) interactWithGRPCServer(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.SendString(fmt.Sprintf("[%s] %d req for %s", o, data.RequestQuantity, data.Resource))
+	output := fmt.Sprintf("request time - %s | memory - %d (kB)", o.RequestTime, o.MemoryUsage)
+	log.Println(output)
+	return c.SendString(output)
 }
 
 func (b *BFFApp) interactWithRabbitMQ(c *fiber.Ctx) error {
@@ -80,26 +90,38 @@ func (b *BFFApp) interactWithRabbitMQ(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.SendString(fmt.Sprintf("[%s] %d req for %s", o, data.RequestQuantity, data.Resource))
+	output := fmt.Sprintf("request time - %s | memory - %d (kB)", o.RequestTime, o.MemoryUsage)
+	log.Println(output)
+	return c.SendString(output)
 }
 
-func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData, method string) (string, error) {
-	log.Default().Printf("[%d req] %s method on %s resource\n", data.RequestQuantity, method, data.Resource)
-
+func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData, method string) (InteractionInfo, error) {
 	totalStart := time.Now()
+
 	if method == httpMethod {
 		if err := HandleHTTP(b.HTTPBaseURL, data); err != nil {
-			return "", err
+			return InteractionInfo{}, err
 		}
 	}
 	if method == grpcMethod {
 		if err := HandleGRPC(c.Context(), b.GRPCServerHost, data); err != nil {
-			return "", err
+			return InteractionInfo{}, err
 		}
 	}
 	if method == rabbitMQMethod {
 		HandleRabbitMQ(b.RabbitMQChannel, b.RabbitMQQueue, data)
 	}
+	var memStats runtime.MemStats
+	runtime.ReadMemStats(&memStats)
 
-	return time.Since(totalStart).String(), nil
+	info := InteractionInfo{
+		RequestTime: time.Since(totalStart).String(),
+		MemoryUsage: convertToKB(memStats.Alloc),
+	}
+
+	return info, nil
+}
+
+func convertToKB(v uint64) uint64 {
+	return v / 1024.0
 }

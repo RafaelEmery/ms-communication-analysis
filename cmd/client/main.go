@@ -78,8 +78,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// TODO: pass all connections and hosts to BFF app and handle methods/calls only
-
 	bff := client.NewBFFApp(httpURL, grpcHost, ch, q)
 	bff.Routes(app)
 

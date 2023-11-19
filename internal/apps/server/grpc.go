@@ -39,6 +39,8 @@ func (s GRPCServer) Create(ctx context.Context, request *CreateProductRequest) (
 		return &CreateProductResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logMemStats()
+
 	return &CreateProductResponse{
 		Id:                o.ID,
 		Name:              o.Name,
@@ -61,6 +63,8 @@ func (s GRPCServer) Report(ctx context.Context, in *EmptyRequest) (*GenerateRepo
 	if err != nil {
 		return &GenerateReportResponse{}, status.Error(codes.Internal, err.Error())
 	}
+
+	logMemStats()
 
 	return &GenerateReportResponse{FileName: o}, nil
 }
@@ -91,6 +95,8 @@ func (s GRPCServer) GetByDiscount(ctx context.Context, in *EmptyRequest) (*GetBy
 
 		ps = append(ps, p)
 	}
+
+	logMemStats()
 
 	return &GetByDiscountResponse{Products: ps}, nil
 }

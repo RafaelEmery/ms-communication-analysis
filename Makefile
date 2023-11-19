@@ -30,7 +30,7 @@ stop:
 
 # Usage: make start service=service_name (optional)
 start-with-build:
-	@docker-compose up -d --build${service}
+	@docker-compose up -d --build ${service}
 
 docker-client-build:
 	docker build -t tcc-client-application -f cmd/client/Dockerfile .
@@ -48,3 +48,15 @@ remove-temporary-files:
 
 load-testing:
 	locust --host=http://0.0.0.0:3002
+
+# Usage: make get-container-logs service=backend_service_name repeat=repetition_value
+get-containers-logs:
+	@docker-compose logs bff-app > logs/bff-app_${repeat}.txt
+	@docker-compose logs ${service} > logs/${service}_${repeat}.txt
+
+remove-containers-logs:
+	@rm -rf logs/*
+
+# Usage: make get-container logs service=backend_service_name repeat=repetition_value
+proccess-log-values:
+	go run cmd/logprocesser/main.go ./logs/${service}_${repeat}.txt

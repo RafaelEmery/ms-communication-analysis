@@ -90,5 +90,7 @@ func (c Consumer) handleUseCases(ctx context.Context, resource, content string) 
 		return fmt.Errorf("invalid resource %s", resource)
 	}
 
+	logMemStats()
+
 	return nil
 }

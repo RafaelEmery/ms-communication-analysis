@@ -44,6 +44,8 @@ func (h *HttpApp) createProduct(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
+	logMemStats()
+
 	return c.Status(fiber.StatusOK).JSON(Return{Result: o})
 }
 
@@ -54,6 +56,8 @@ func (h *HttpApp) getReport(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
+	logMemStats()
+
 	return c.Status(fiber.StatusOK).JSON(Return{Result: o})
 }
 
@@ -63,6 +67,8 @@ func (h *HttpApp) getByAppliedDiscount(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
+
+	logMemStats()
 
 	return c.Status(fiber.StatusOK).JSON(Return{Result: o})
 }
