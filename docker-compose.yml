@@ -28,6 +28,8 @@ services:
     networks:
       - my_network
   http-app:
+    mem_limit: 4g
+    cpus: 2
     build:
       context: ./
       dockerfile: ./cmd/server/Dockerfile.http
@@ -37,6 +39,8 @@ services:
     networks:
       - my_network
   grpc-app:
+    mem_limit: 4g
+    cpus: 2
     build:
       context: ./
       dockerfile: ./cmd/server/Dockerfile.grpc
@@ -46,6 +50,8 @@ services:
     networks:
       - my_network
   rabbitmq-app:
+    mem_limit: 4g
+    cpus: 2
     build:
       context: ./
       dockerfile: ./cmd/server/Dockerfile.rabbitmq
@@ -53,6 +59,8 @@ services:
     networks:
       - my_network
   bff-app:
+    mem_limit: 4g
+    cpus: 2
     build:
       context: ./
       dockerfile: ./cmd/client/Dockerfile

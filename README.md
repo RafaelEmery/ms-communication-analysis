@@ -30,4 +30,9 @@ CREATE TABLE IF NOT EXISTS
 );
 ```
 
-**TODO:** Set table by default at postgres container `volumes`
+## TODOs
+
+- Verify total allocated memory 
+- Verify logging the total allocated memory used
+- Test report and get use case at largest amount
+- Limit all containers memory and CPU on docker-compose.yml :ok:
