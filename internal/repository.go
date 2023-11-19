@@ -28,9 +28,10 @@ func (r Repository) Create(ctx context.Context, p Product) error {
 
 func (r Repository) Get(ctx context.Context) (Products, error) {
 	query := `
-		SELECT 
+		SELECT
 			id, name, sku, seller_name, price, available_discount, available_quantity, sales_quantity, active, created_at, updated_at
 		FROM products
+		LIMIT 100
 	`
 	rows, err := r.db.Query(query)
 	if err != nil {
