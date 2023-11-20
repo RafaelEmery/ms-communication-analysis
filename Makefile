@@ -31,15 +31,15 @@ fix-start:
 stop:
 	@docker-compose down
 
+bff-container-logs:
+	@docker-compose logs bff-app
+
 # Usage: make start service=service_name (optional)
 start-with-build:
 	@docker-compose up -d --build ${service}
 
 docker-client-build:
 	docker build -t tcc-client-application -f cmd/client/Dockerfile .
-
-restart: 
-	@docker-compose restart
 
 proto-generate:
 	@rm internal/apps/message_grpc.pb.go
@@ -54,7 +54,7 @@ load-testing:
 
 # Usage: make get-container-logs service=backend_service_name repeat=repetition_value
 get-containers-logs:
-	@docker-compose logs bff-app > logs/bff-app_${repeat}.txt
+	@docker-compose logs bff-app > logs/bff-app_${service}_${repeat}.txt
 	@docker-compose logs ${service} > logs/${service}_${repeat}.txt
 
 remove-containers-logs:
@@ -62,5 +62,11 @@ remove-containers-logs:
 
 # Usage: make get-container logs service=backend_service_name repeat=repetition_value
 proccess-log-values:
-	go run cmd/logprocesser/main.go ./logs/bff-app_${repeat}.txt
+	go run cmd/logprocesser/main.go ./logs/bff-app_${service}_${repeat}.txt
 	go run cmd/logprocesser/main.go ./logs/${service}_${repeat}.txt
+
+restart-script:
+	./restart.sh
+
+extract-script:
+	./extract.sh ${service} ${repeat}

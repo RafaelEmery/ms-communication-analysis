@@ -97,7 +97,7 @@ func (b *BFFApp) interactWithRabbitMQ(c *fiber.Ctx) error {
 
 func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData, method string) (InteractionInfo, error) {
 	totalStart := time.Now()
-
+	
 	if method == httpMethod {
 		if err := HandleHTTP(b.HTTPBaseURL, data); err != nil {
 			return InteractionInfo{}, err
@@ -116,7 +116,7 @@ func (b *BFFApp) handleMethods(c *fiber.Ctx, data InteractionData, method string
 
 	info := InteractionInfo{
 		RequestTime: time.Since(totalStart).String(),
-		MemoryUsage: convertToKB(memStats.TotalAlloc),
+		MemoryUsage: convertToKB(memStats.Alloc),
 	}
 
 	return info, nil

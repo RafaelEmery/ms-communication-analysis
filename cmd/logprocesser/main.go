@@ -24,14 +24,20 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	maxMemory := 0
+	sumMemory := 0
+	numValues := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
 		memoryMatch := extractMemory(line)
 		if memoryMatch != nil {
 			memoryValue, err := strconv.Atoi(memoryMatch[1])
-			if err == nil && memoryValue > maxMemory {
-				maxMemory = memoryValue
+			if err == nil {
+				if memoryValue > maxMemory {
+					maxMemory = memoryValue
+				}
+				sumMemory += memoryValue
+				numValues++
 			}
 		}
 	}
@@ -41,6 +47,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	averageMemory := float64(sumMemory) / float64(numValues)
+	fmt.Printf("A média dos valores de memória é: %.2f (kB)\n", averageMemory)
 	fmt.Printf("max memory found: %d (kB)\n", maxMemory)
 }
 
