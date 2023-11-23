@@ -1,7 +1,7 @@
 from locust import HttpUser, task
 
 class BFFUser(HttpUser):
-    common_resource = "getByDiscount"
+    common_resource = "create"
     request_count = 0
     request_threshold = 5000
 
