@@ -41,7 +41,6 @@ func main() {
 		dbTimeMatch := extractDatabaseTime(line)
 		if dbTimeMatch != nil {
 			dbTimeValue, err := strconv.ParseFloat(dbTimeMatch[1], 64)
-			fmt.Println("time value: ", dbTimeMatch[1])
 			if err == nil {
 				sumDatabaseTime += dbTimeValue
 				numDatabaseValues++
