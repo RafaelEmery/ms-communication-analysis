@@ -1,23 +1,19 @@
 from locust import HttpUser, task
 
 class BFFUser(HttpUser):
-    common_resource = "create"
-    request_count = 0
-    request_threshold = 5000
-
     @task
-    def do_client_server_interaction_http(self):
+    def do_client_server_interaction(self):
         headers = {
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": self.common_resource,
+            "resource": "getByDiscount",
             "request_quantity": 1
         }
 
         print(f"Payload: {payload}")
 
-        res = self.client.post("/interact/http", json=payload, headers=headers)
+        res = self.client.post("/interact/grpc", json=payload, headers=headers)
         
         print(f"Status Code: {res.status_code}")
         print(f"Response Content: {res.content}")

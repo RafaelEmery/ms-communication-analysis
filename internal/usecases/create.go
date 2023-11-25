@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"log"
 	"time"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
@@ -26,9 +27,11 @@ func (u createUseCase) Create(ctx context.Context, p domain.Product) (domain.Pro
 	p.CreatedAt = time.Now()
 	p.UpdatedAt = time.Now()
 
+	start := time.Now()
 	if err := u.c.Create(ctx, p); err != nil {
 		return domain.Product{}, err
 	}
+	log.Printf("database interaction time - %s", time.Since(start).String())
 
 	return p, nil
 }

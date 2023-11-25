@@ -2,7 +2,9 @@ package usecases
 
 import (
 	"context"
+	"log"
 	"sort"
+	"time"
 
 	domain "github.com/RafaelEmery/performance-analysis-server/internal"
 )
@@ -16,10 +18,13 @@ func NewGetByDiscountUseCase(g ProductGetter) getByDiscountUseCase {
 }
 
 func (u getByDiscountUseCase) GetByDiscount(ctx context.Context) (domain.Products, error) {
+	start := time.Now()
 	p, err := u.g.Get(ctx)
 	if err != nil {
 		return domain.Products{}, err
 	}
+
+	log.Printf("database interaction time - %s", time.Since(start).String())
 
 	dps := u.applyAvailableDiscount(p)
 	orderedDPs := u.orderByPrice(dps)

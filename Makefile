@@ -21,20 +21,21 @@ deps:
 	go mod download
 	go mod tidy
 
-# Usage: make start service=service_name (optional)
+# Usage: make start service=service-name (optional)
 start:
 	@docker-compose up -d ${service}
 
-fix-start:
-	@docker-compose up -d bff-app
+# fix-start:
+# 	@docker-compose up -d bff-app
 
 stop:
 	@docker-compose down
 
-bff-container-logs:
+get-container-logs:
 	@docker-compose logs bff-app
+	@docker-compose logs ${service}-app
 
-# Usage: make start service=service_name (optional)
+# Usage: make start service=service-name (optional)
 start-with-build:
 	@docker-compose up -d --build ${service}
 
@@ -52,21 +53,25 @@ remove-temporary-files:
 load-testing:
 	locust --host=http://0.0.0.0:3002
 
-# Usage: make get-container-logs service=backend_service_name repeat=repetition_value
-get-containers-logs:
-	@docker-compose logs bff-app > logs/bff-app_${service}_${repeat}.txt
-	@docker-compose logs ${service} > logs/${service}_${repeat}.txt
+# Usage: make get-logs service=server-service-name (without "-app") index=index
+get-logs:
+	@docker-compose logs ${service}-app > logs/${service}-app-${index}.txt
 
 remove-containers-logs:
 	@rm -rf logs/*
 
-# Usage: make get-container logs service=backend_service_name repeat=repetition_value
-proccess-log-values:
-	go run cmd/logprocesser/main.go ./logs/bff-app_${service}_${repeat}.txt
-	go run cmd/logprocesser/main.go ./logs/${service}_${repeat}.txt
+# Usage: make proccess-logs service=server-service-name (without "-app") index=index
+proccess-logs:
+	go run cmd/logprocesser/main.go ./logs/${service}-app-${index}.txt
+
+start-specific:
+	./scripts/start-specific.sh ${service}
 
 restart-script:
-	./restart.sh
+	./scripts/restart-all.sh
+
+specific-restart-script:
+	./scripts/restart-specific.sh ${service}
 
 extract-script:
-	./extract.sh ${service} ${repeat}
+	./scripts/extract.sh ${service} ${index}

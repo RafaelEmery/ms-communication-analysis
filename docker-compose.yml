@@ -1,6 +1,5 @@
 version: "3.5"
 
-# TODO: change to already builded image when it's finished
 services:
   postgres:
     image: postgres:latest
@@ -38,6 +37,8 @@ services:
       - "${HTTP_APP_PORT}:3000"
     networks:
       - my_network
+    depends_on:
+      - postgres
   grpc-app:
     mem_limit: 4g
     cpus: 2
@@ -49,6 +50,8 @@ services:
       - "${GRPC_APP_PORT}:3001"
     networks:
       - my_network
+    depends_on:
+      - postgres
   rabbitmq-app:
     mem_limit: 4g
     cpus: 2
@@ -58,6 +61,9 @@ services:
     container_name: tcc_server_rabbitmq_application
     networks:
       - my_network
+    depends_on:
+      - postgres
+      - rabbitmq
   bff-app:
     mem_limit: 4g
     cpus: 2
@@ -69,8 +75,6 @@ services:
       - "${BFF_APP_PORT}:3002"
     networks:
       - my_network
-    depends_on:
-      - rabbitmq-app
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
