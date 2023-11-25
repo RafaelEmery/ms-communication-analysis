@@ -23,9 +23,10 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	maxMemory := 0
 	sumMemory := 0
-	numValues := 0
+	numMemoryValues := 0
+	var sumDatabaseTime float64
+	numDatabaseValues := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -33,11 +34,17 @@ func main() {
 		if memoryMatch != nil {
 			memoryValue, err := strconv.Atoi(memoryMatch[1])
 			if err == nil {
-				if memoryValue > maxMemory {
-					maxMemory = memoryValue
-				}
 				sumMemory += memoryValue
-				numValues++
+				numMemoryValues++
+			}
+		}
+		dbTimeMatch := extractDatabaseTime(line)
+		if dbTimeMatch != nil {
+			dbTimeValue, err := strconv.ParseFloat(dbTimeMatch[1], 64)
+			fmt.Println("time value: ", dbTimeMatch[1])
+			if err == nil {
+				sumDatabaseTime += dbTimeValue
+				numDatabaseValues++
 			}
 		}
 	}
@@ -47,12 +54,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	averageMemory := float64(sumMemory) / float64(numValues)
-	fmt.Printf("A média dos valores de memória é: %.2f (kB)\n", averageMemory)
-	fmt.Printf("max memory found: %d (kB)\n", maxMemory)
+	averageMemory := float64(sumMemory) / float64(numMemoryValues)
+	fmt.Printf("1 - memory average: %.2f (kB)\n", averageMemory)
+
+	averageDatabaseTime := sumDatabaseTime / float64(numDatabaseValues)
+	fmt.Printf("2 - database interaction time average: %.2f (ms)\n", averageDatabaseTime)
 }
 
 func extractMemory(line string) []string {
 	re := regexp.MustCompile(`memory - (\d+) \(kB\)`)
+	return re.FindStringSubmatch(line)
+}
+
+func extractDatabaseTime(line string) []string {
+	re := regexp.MustCompile(`database interaction time - (\d+\.\d+)ms`)
 	return re.FindStringSubmatch(line)
 }

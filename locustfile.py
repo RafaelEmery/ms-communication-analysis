@@ -7,13 +7,13 @@ class BFFUser(HttpUser):
             "Content-Type": "application/json"
         }
         payload = {
-            "resource": "getByDiscount",
+            "resource": "create",
             "request_quantity": 1
         }
 
         print(f"Payload: {payload}")
 
-        res = self.client.post("/interact/grpc", json=payload, headers=headers)
+        res = self.client.post("/interact/http", json=payload, headers=headers)
         
         print(f"Status Code: {res.status_code}")
         print(f"Response Content: {res.content}")
