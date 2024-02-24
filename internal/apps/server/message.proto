@@ -1,17 +1,14 @@
 syntax = "proto3";
 option go_package = "github.com/RafaelEmery/performance-analysis-server/internal/apps";
 
-// TODO: is this the definition of "prodedure calls"?
 service ProductHandler {
     rpc Create (CreateProductRequest) returns (CreateProductResponse) {}
     rpc Report (EmptyRequest) returns (GenerateReportResponse) {}
     rpc GetByDiscount (EmptyRequest) returns (GetByDiscountResponse) {}
 }
 
-// TODO: validate the request without body
 message EmptyRequest {}
 
-// TODO: what means all the = <number>
 message CreateProductRequest {
     string name = 1;
     string sku = 2;

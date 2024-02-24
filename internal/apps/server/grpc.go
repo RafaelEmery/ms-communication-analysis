@@ -10,7 +10,6 @@ import (
 )
 
 type GRPCServer struct {
-	// TODO: understand the HandlerServer below
 	// s   p.UnimplementedProductHandlerServer
 	c   Creator
 	rg  ReportGenerator
@@ -101,5 +100,4 @@ func (s GRPCServer) GetByDiscount(ctx context.Context, in *EmptyRequest) (*GetBy
 	return &GetByDiscountResponse{Products: ps}, nil
 }
 
-// TODO: validate function definition and it's utility
 func (s GRPCServer) mustEmbedUnimplementedProductHandlerServer() {}

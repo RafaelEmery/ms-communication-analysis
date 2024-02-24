@@ -6,56 +6,24 @@ class BFFUser(HttpUser):
         headers = {
             "Content-Type": "application/json"
         }
+        """
+        The "resource" key specify the feature on the server application.
+        The "request_quantity" key specify the number of requests to be made to the server.
+        """
         payload = {
-            "resource": "create",
+            "resource": "getByDiscount",
             "request_quantity": 1
         }
 
-        print(f"Payload: {payload}")
-
-        res = self.client.post("/interact/http", json=payload, headers=headers)
+        """
+        The /interact/<method> endpoint is used trigger BFF and specified server.
+        The options to /interact/<method> are http|grpc|rabbitmq
+        """
+        res = self.client.post("/interact/grpc", json=payload, headers=headers)
         
+        """
+        The response content will be printed to the console.
+        Contains useful info for debugging.
+        """
         print(f"Status Code: {res.status_code}")
         print(f"Response Content: {res.content}")
-
-    # @task()
-    # def do_client_server_interaction_grpc(self):
-    #     headers = {
-    #         "Content-Type": "application/json"
-    #     }
-    #     payload = {
-    #         "resource": self.common_resource,
-    #         "request_quantity": 1
-    #     }
-
-    #     print(f"Payload: {payload}")
-
-    #     res = self.client.post("/interact/grpc", json=payload, headers=headers)
-        
-    #     print(f"Status Code: {res.status_code}")
-    #     print(f"Response Content: {res.content}")
-
-    #     self.request_count += 1
-    #     if self.request_count >= self.request_threshold:
-    #         self.environment.runner.quit()
-
-    # @task()
-    # def do_client_server_interaction_rabbit_mq(self):
-    #     headers = {
-    #         "Content-Type": "application/json"
-    #     }
-    #     payload = {
-    #         "resource": self.common_resource,
-    #         "request_quantity": 1
-    #     }
-
-    #     print(f"Payload: {payload}")
-
-    #     res = self.client.post("/interact/rabbitmq", json=payload, headers=headers)
-        
-    #     print(f"Status Code: {res.status_code}")
-    #     print(f"Response Content: {res.content}")
-
-    #     self.request_count += 1
-    #     if self.request_count >= self.request_threshold:
-    #         self.environment.runner.quit()

@@ -46,7 +46,6 @@ func (u getByDiscountUseCase) applyAvailableDiscount(ps domain.Products) domain.
 }
 
 func (u getByDiscountUseCase) orderByPrice(dps domain.Products) domain.Products {
-	// TODO: validate algorithm that sort.Slice uses and if it's CPU bound
 	sort.Slice(dps, func(i, j int) bool {
 		return dps[i].Price < dps[j].Price
 	})

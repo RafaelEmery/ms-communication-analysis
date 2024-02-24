@@ -8,8 +8,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// TODO: applications and database setup can be a custom command - test it later!
-
 type ProductsManager interface {
 	Count(ctx context.Context) (int, error)
 	BatchCreate(ctx context.Context, p domain.Products) error

@@ -58,7 +58,6 @@ func (*EmptyRequest) Descriptor() ([]byte, []int) {
 	return file_internal_apps_message_proto_rawDescGZIP(), []int{0}
 }
 
-// TODO: what means all the = <number>
 type CreateProductRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

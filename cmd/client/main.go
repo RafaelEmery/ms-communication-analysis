@@ -45,38 +45,36 @@ func main() {
 	httpURL := fmt.Sprintf("http://%s:%s", env.HTTPHost, env.HTTPPort)
 	grpcHost := fmt.Sprintf("%s:%s", env.GRPCHost, env.GRPCPort)
 
-	// TODO: message broker message publishing is temporary unavailable on client application
-	// time.Sleep(5 * time.Second)
-	// var conn *amqp.Connection
+	var conn *amqp.Connection
 	var ch *amqp.Channel
 	var q amqp.Queue
 
-	// connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port)
-	// log.Default().Println("rabbitMQ connection string: ", connectionString)
-	// conn, err = amqp.Dial(connectionString)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer conn.Close()
-	// log.Default().Println("rabbitMQ successfully connected: ", !conn.IsClosed())
+	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", env.RabbitMQ.User, env.RabbitMQ.User, env.RabbitMQ.Host, env.RabbitMQ.Port)
+	log.Default().Println("rabbitMQ connection string: ", connectionString)
+	conn, err = amqp.Dial(connectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+	log.Default().Println("rabbitMQ successfully connected: ", !conn.IsClosed())
 
-	// ch, err = conn.Channel()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer ch.Close()
+	ch, err = conn.Channel()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ch.Close()
 
-	// q, err = ch.QueueDeclare(
-	// 	env.RabbitMQ.QueueName, // Name
-	// 	false,                  // Durable
-	// 	false,                  // Delete when unused
-	// 	false,                  // Exclusive
-	// 	false,                  // No-wait
-	// 	nil,                    // Arguments
-	// )
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	q, err = ch.QueueDeclare(
+		env.RabbitMQ.QueueName, // Name
+		false,                  // Durable
+		false,                  // Delete when unused
+		false,                  // Exclusive
+		false,                  // No-wait
+		nil,                    // Arguments
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	bff := client.NewBFFApp(httpURL, grpcHost, ch, q)
 	bff.Routes(app)
