@@ -1,14 +1,6 @@
-## Performance Analysis Server
+# Performance Analysis Applications
 
-TODO: write description and docs here 😄
-
-### Database `tcc_db` 
-
-To running database containers you'll run:
-
-```bash
-make start
-```
+Base project 
 
 Just run the following query for `products` table:
 
@@ -29,10 +21,3 @@ CREATE TABLE IF NOT EXISTS
     CONSTRAINT product_pkey PRIMARY KEY (id)
 );
 ```
-
-## TODOs
-
-- Verify total allocated memory 
-- Verify logging the total allocated memory used
-- Test report and get use case at largest amount
-- Limit all containers memory and CPU on docker-compose.yml :ok:

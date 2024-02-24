@@ -150,12 +150,12 @@ func main() {
 		defer ch.Close()
 
 		q, err := ch.QueueDeclare(
-			env.RabbitMQ.QueueName, // Name
-			false,                  // Durable
-			false,                  // Delete when unused
-			false,                  // Exclusive
-			false,                  // No-wait
-			nil,                    // Arguments
+			env.RabbitMQ.QueueName,
+			false,
+			false,
+			false,
+			false,
+			nil,
 		)
 		if err != nil {
 			log.Fatal(err)
