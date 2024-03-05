@@ -9,6 +9,32 @@ Monorepo written in Golang for performance analysis on 3 methods for microservic
 
 ![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![RabbitMQ](https://img.shields.io/badge/Rabbitmq-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) 
 
+## :bookmark_tabs: Contents
+- [Microservices Communication Analysis Apps](#microservices-communication-analysis-apps)
+  - [:bookmark\_tabs: Contents](#bookmark_tabs-contents)
+  - [:scroll: Full paper](#scroll-full-paper)
+  - [:dart: Main goals](#dart-main-goals)
+  - [:clipboard: Main parameters and metrics](#clipboard-main-parameters-and-metrics)
+    - [Parameters](#parameters)
+    - [Metrics](#metrics)
+  - [:chart\_with\_upwards\_trend: Main results (pt-BR)](#chart_with_upwards_trend-main-results-pt-br)
+    - [Memory usage:](#memory-usage)
+    - [Failures:](#failures)
+    - [Time metrics:](#time-metrics)
+    - [Main bottleneck](#main-bottleneck)
+  - [:gem: Proposed architecture](#gem-proposed-architecture)
+  - [:open\_file\_folder: Project structure](#open_file_folder-project-structure)
+    - [`cmd`](#cmd)
+    - [`internal`](#internal)
+    - [`docker-compose.yml`](#docker-composeyml)
+    - [`locustfile.py`](#locustfilepy)
+    - [`Makefile`](#makefile)
+  - [:running: Running the project](#running-running-the-project)
+    - [Database](#database)
+    - [Starting applications](#starting-applications)
+    - [BFF endpoints and parameters](#bff-endpoints-and-parameters)
+    - [Stress testing](#stress-testing)
+
 ## :scroll: Full paper
 
 [Microservices communication methods (REST, gRPC, Message Broker) performance analysis (pt-BR)](https://drive.google.com/file/d/1wosRutXvNHIUwBepBZVAmtmMULP-NjBj/view?usp=sharing)
