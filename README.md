@@ -16,8 +16,11 @@ Monorepo written in Golang for performance analysis on 3 methods for microservic
 ## :dart: Main goals
 
 :white_check_mark: Implement all three methods of communication in a *Monorepository* and use clean architecture.
+
 :white_check_mark: Which communication method perform better considering the defined parameters.
+
 :white_check_mark: Which communication method presents the least failures in the stress test.
+
 :white_check_mark: What's the main bottleneck in the system.
 
 ## :clipboard: Main parameters and metrics
