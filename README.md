@@ -68,6 +68,7 @@ Testing the combination of all the parameters and it's variations and getting th
 :bulb: The REST database interaction time is bigger than in gRPC, which means that REST server consumes more from database.
 
 100 and 200 users:
+
 ![time-100](./assets/time-100.png) ![time-200](./assets/time-200.png)
 
 ### Main bottleneck
