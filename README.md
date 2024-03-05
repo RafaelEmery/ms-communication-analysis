@@ -93,7 +93,9 @@ Testing the combination of all the parameters and it's variations and getting th
 ### Time metrics
 
 :bulb: The gRPC is faster than REST in retrieving data cases.
+
 :bulb: The REST is faster in other cases.
+
 :bulb: The REST database interaction time is bigger than in gRPC, which means that REST server consumes more from database.
 
 100 and 200 users:
