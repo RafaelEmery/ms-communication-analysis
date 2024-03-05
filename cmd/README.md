@@ -17,7 +17,7 @@ go run -type=rabbitmq
 
 Due to the approach of using flags instead of different `main.go` files for each application, the `Dockerfile` needed to be defined differently by using the sufix *.http*, *.grpc* and *rabbitmq* to be used to build on `docker-compose.yml`
 
-:bell: it also has the `-type=setup` flag to run the Setup Application, a simple API to provide facilities to handle database during local tests, although can't be used inside a Docker container.
+:bell: It also has the `-type=setup` flag to run the Setup Application, a simple API to provide facilities to handle database during local tests, although can't be used inside a Docker container.
 
 ### *logprocesser*
 
